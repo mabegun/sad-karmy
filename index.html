@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#5D4037">
+    <link rel="manifest" href="manifest.json">
+    <title>Сад Кармы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #8D6E63; --accent-color: #D4AF37; --accent-dark: #B8860B;
+            --bg-paper: #F5F1E6; --text-ink: #3E2723; --text-light: #5D4037;
+            --success-color: #2E7D32; --danger-color: #C62828;
+            --shadow-soft: 0 4px 15px rgba(62, 39, 35, 0.15);
+        }
+
+        body {
+            font-family: 'Lora', serif; margin: 0; background-color: var(--bg-paper);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            color: var(--text-ink); min-height: 100vh; padding-bottom: 130px;
+        }
+
+        .header {
+            background: linear-gradient(to bottom, #5D4037, #3E2723); color: var(--accent-color);
+            padding: 15px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--accent-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .header-text h1 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .header-text p { margin: 2px 0 0; font-size: 11px; opacity: 0.8; font-style: italic; }
+        
+        .header-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid var(--accent-color);
+            color: var(--accent-color); padding: 8px 12px; border-radius: 20px;
+            font-size: 12px; cursor: pointer; transition: 0.3s; text-decoration: none;
+            display: flex; align-items: center; gap: 5px; font-weight: 600;
+        }
+        .header-btn:hover { background: var(--accent-color); color: #3E2723; }
+
+        .tabs-container {
+            display: flex; overflow-x: auto; background: rgba(255,255,255,0.5);
+            border-bottom: 1px solid #D7CCC8; position: sticky; top: 0; z-index: 100;
+        }
+        .tab {
+            flex: 1 0 auto; padding: 15px 10px; text-align: center; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: 0.3s; font-size: 13px;
+            font-weight: 600; color: var(--text-light); white-space: nowrap;
+        }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--accent-color); background: rgba(255,255,255,0.8); }
+
+        .container { max-width: 700px; margin: 0 auto; padding: 20px 15px; }
+        .empty-state { text-align: center; margin-top: 50px; color: #8D6E63; font-style: italic; }
+        .empty-icon { font-size: 50px; opacity: 0.3; margin-bottom: 10px; }
+
+        .card {
+            background: rgba(255,255,255,0.9); margin-bottom: 15px; border-radius: 4px;
+            border-left: 4px solid var(--accent-color); box-shadow: var(--shadow-soft);
+            position: relative; transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); }
+        .card-body { padding: 15px; }
+        .card-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--text-ink); margin-bottom: 5px; border-bottom: 1px dashed #D7CCC8; padding-bottom: 5px; }
+        .card-text { font-size: 14px; line-height: 1.5; color: var(--text-light); }
+        .card-meta { font-size: 12px; margin-top: 10px; color: var(--accent-dark); font-style: italic; display: flex; align-items: center; gap: 5px; }
+        .card-actions { display: flex; gap: 10px; margin-top: 12px; border-top: 1px solid #EFEBE9; padding-top: 12px; flex-wrap: wrap; }
+
+        .counters-container { display: flex; gap: 10px; margin-top: 12px; margin-bottom: 5px; }
+        .counter-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #EFEBE9; padding: 5px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: bold; color: var(--text-light);
+            cursor: pointer; border: 1px solid transparent; transition: 0.2s;
+        }
+        .counter-badge:hover { background: #fff; border-color: var(--accent-color); color: var(--text-ink); }
+        .counter-badge.done { color: var(--success-color); }
+        .counter-badge.zero { opacity: 0.5; pointer-events: none; }
+
+        .btn {
+            border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer;
+            font-family: 'Lora', serif; font-size: 13px; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+            flex: 1;
+        }
+        .btn-primary { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        .btn-success { background: transparent; border: 1px solid var(--success-color); color: var(--success-color); }
+        .btn-warning { background: transparent; border: 1px solid #F57F17; color: #F57F17; }
+        .btn-danger { background: transparent; border: 1px solid #BDBDBD; color: #757575; }
+        
+        .btn-delete-confirm { background: var(--danger-color); border-color: var(--danger-color); color: white; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .fab {
+            position: fixed; bottom: max(75px, calc(20px + env(safe-area-inset-bottom))); 
+            right: 20px; width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white; border-radius: 50%; border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px; cursor: pointer; z-index: 50;
+        }
+        .meditation-btn {
+            position: fixed; bottom: max(75px, calc(20px + env(safe-area-inset-bottom)));
+            left: 20px; right: 90px;
+            background: linear-gradient(to right, #5D4037, #3E2723); color: var(--accent-color);
+            padding: 15px; border-radius: 30px; text-align: center;
+            box-shadow: var(--shadow-soft); font-weight: 600; border: 1px solid var(--accent-color);
+            z-index: 50; font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; margin: 5px 0 15px; border: 1px solid #D7CCC8;
+            border-radius: 3px; background: #FBFBFB; font-family: 'Lora', serif;
+            font-size: 16px; color: var(--text-ink); box-sizing: border-box;
+        }
+        input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); }
+        label { font-size: 13px; font-weight: 600; color: var(--text-light); }
+
+        /* --- Модальные окна --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(62, 39, 35, 0.7); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-paper); border-radius: 5px; width: 90%; max-width: 450px; position: relative; border: 1px solid var(--accent-color); box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { padding: 20px 25px 15px 25px; border-bottom: 1px solid #D7CCC8; position: relative; flex-shrink: 0; background: var(--bg-paper); }
+        .modal-header h3 { margin: 0; font-family: 'Cormorant Garamond', serif; color: var(--text-ink); font-size: 20px; padding-right: 30px; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: var(--primary-color); line-height: 1; background: none; border: none; }
+        .modal-body { padding: 20px 25px; overflow-y: auto; flex-grow: 1; }
+
+        .info-text { text-align: left; font-size: 14px; line-height: 1.6; color: var(--text-ink); }
+        .info-text h2 { font-family: 'Cormorant Garamond', serif; color: var(--primary-color); border-bottom: 1px solid #D7CCC8; padding-bottom: 10px; margin-top: 25px; font-size: 20px; }
+        .info-text h2:first-child { margin-top: 0; }
+        .info-text h3 { color: var(--accent-dark); font-size: 17px; margin-top: 15px; margin-bottom: 8px; }
+        .info-text p { margin-bottom: 12px; }
+        .info-text ul { padding-left: 20px; margin-bottom: 15px; }
+        .info-text li { margin-bottom: 8px; }
+        .instruction-step { background: rgba(255,255,255,0.6); padding: 15px; border-radius: 5px; margin-bottom: 15px; border-left: 3px solid var(--accent-color); }
+        .instruction-step h3 { margin-top: 0; color: var(--accent-dark); font-size: 16px; margin-bottom: 10px; }
+        .highlight { color: var(--primary-color); font-weight: bold; }
+        .warning-box { background: rgba(198, 40, 40, 0.05); border-left: 3px solid var(--danger-color); padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .dev-warning { font-size: 12px; color: var(--danger-color); margin-top: 10px; font-style: italic; }
+        
+        .info-menu-btn { display: block; width: 100%; padding: 20px; margin-bottom: 10px; background: rgba(255,255,255,0.5); border: 1px solid #D7CCC8; text-align: left; font-family: 'Lora', serif; font-size: 16px; color: var(--text-ink); border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .info-menu-btn:hover { background: #fff; border-color: var(--accent-color); }
+        .info-menu-btn span { font-size: 20px; margin-right: 10px; vertical-align: middle; }
+
+        .seed-list-item { background: rgba(255,255,255,0.6); border-left: 3px solid var(--accent-color); padding: 10px; margin-bottom: 8px; font-size: 14px; }
+        .seed-list-item.done-item { border-left-color: var(--success-color); background: rgba(46, 125, 50, 0.05); }
+
+        .settings-group { background: rgba(255,255,255,0.5); padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #D7CCC8; }
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+        
+        .btn-action { width: 100%; padding: 15px; font-size: 16px; font-weight: 600; background: linear-gradient(to right, #5D4037, #3E2723); color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 5px; margin-bottom: 10px; }
+        .btn-action.import { background: transparent; color: var(--text-ink); border: 1px solid #D7CCC8; }
+        .btn-action.secondary { background: transparent; color: var(--text-light); border: 1px solid #D7CCC8; }
+
+        /* Плашка обновления */
+        #update-notification { display: none; position: fixed; bottom: 80px; left: 20px; right: 20px; background: var(--accent-color); color: #3E2723; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; text-align: center; font-weight: bold; border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+
+<!-- Плашка об обновлении -->
+<div id="update-notification">
+    ✨ Доступна новая версия! 
+    <button onclick="updateApp()" style="background: #3E2723; color: var(--accent-color); border: none; padding: 8px 20px; border-radius: 20px; margin-left: 10px; font-weight: bold; cursor: pointer;">Обновить</button>
+</div>
+
+<div class="header">
+    <div class="header-text">
+        <h1>Сад Кармы</h1>
+        <p>Мудрость Тибета в твоем сердце</p>
+    </div>
+    <button class="header-btn" onclick="openInfoMenu()">ⓘ О приложении</button>
+</div>
+
+<!-- Вкладки -->
+<div class="tabs-container">
+    <div class="tab active" onclick="switchTab('goals', this)">🏔 Цели</div>
+    <div class="tab" onclick="switchTab('planting', this)">🌱 Посев</div>
+    <div class="tab" onclick="switchTab('done', this)">🙏 Сделано</div>
+    <div class="tab" onclick="switchTab('harvest', this)">🌾 Урожай</div>
+    <div class="tab" onclick="switchTab('settings', this)">⚙️</div>
+</div>
+
+<!-- Контент -->
+<div class="container">
+    <div id="tab-goals" class="tab-content"></div>
+    <div id="tab-planting" class="tab-content" style="display:none;"></div>
+    <div id="tab-done" class="tab-content" style="display:none;"></div>
+    <div id="tab-harvest" class="tab-content" style="display:none;"></div>
+    <div id="tab-settings" class="tab-content" style="display:none;"></div>
+</div>
+
+<!-- Кнопки -->
+<button class="meditation-btn" onclick="openMeditation()">☕ Кофе-медитация</button>
+<button class="fab" onclick="openModal()">+</button>
+
+<!-- Модальные окна -->
+
+<!-- 1. Меню "О приложении" -->
+<div id="info-menu-modal" class="modal">
+    <div class="modal-content" style="max-width: 350px;">
+        <div class="modal-header">
+            <h3>ℹ️ О приложении</h3>
+            <button class="close-btn" onclick="closeInfoMenu()">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <button class="info-menu-btn" onclick="closeInfoMenu(); openInstruction();"><span>📖</span> Инструкция</button>
+            <button class="info-menu-btn" onclick="closeInfoMenu(); openPrivacy();"><span>📜</span> Конфиденциальность</button>
+            <button class="info-menu-btn" onclick="closeInfoMenu(); openInstall();"><span>📲</span> Как установить</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Окно редактирования -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Заголовок</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+    </div>
+</div>
+
+<!-- 3. Инструкция -->
+<div id="instruction-modal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header"><h3>📖 Инструкция</h3><button class="close-btn" onclick="closeInstruction()">&times;</button></div>
+        <div class="modal-body"><div class="info-text">
+            <h2>Инструкция 🌱</h2>
+            <p>Привет! Это приложение поможет тебе изменить свою жизнь. <b>Главное правило:</b> <span class="highlight">всё исходит из кармических семян в уме</span>.</p>
+            <h2>История про ручку ✍️</h2>
+            <p>Представь ручку. Для тебя это ручка. Для собачки — игрушка. Если никого нет — это «белый бланк».</p>
+            <p><b>Вывод:</b> Ручка исходит из тебя. Так и весь мир исходит из твоих семян.</p>
+            <h2>Шаги 🧭</h2>
+            <div class="instruction-step"><h3>1. Цель 🎯</h3><p>Определи, что хочешь получить. Раздел "Цели".</p></div>
+            <div class="instruction-step"><h3>2. Посев 🌱</h3><p>Найди человека с похожей потребностью. Раздел "Посев".</p></div>
+            <div class="instruction-step"><h3>3. Действие ✅</h3><p>Сделай и нажми "Сделано".</p></div>
+            <div class="instruction-step"><h3>4. Медитация ☕</h3><p>Каждый вечер радуйся сделанному добру.</p></div>
+            <div class="instruction-step" style="border-left-color: var(--success-color);"><h3>💾 Бэкап</h3><p>Экспорт в Настройках -> Сохранить файл.</p></div>
+        </div></div>
+    </div>
+</div>
+
+<!-- 4. Конфиденциальность -->
+<div id="privacy-modal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header"><h3>🔒 Конфиденциальность</h3><button class="close-btn" onclick="closePrivacy()">&times;</button></div>
+        <div class="modal-body"><div class="info-text">
+            <h2>Привет! 🌿</h2>
+            <p>Приложение по мотивам книг Майкла Роуча.</p>
+            <h2>Безопасность 🔒</h2>
+            <ul><li>Не собираем данные.</li><li>Нет аналитики.</li><li>Данные только в твоем браузере.</li></ul>
+            <div class="warning-box">⚠️ При смене браузера данные потеряются. Используй Экспорт/Импорт!</div>
+            <p style="text-align: center; margin-top: 20px;"><button class="btn btn-primary" onclick="closePrivacy(); openInstruction();">📖 Открыть Инструкцию</button></p>
+        </div></div>
+    </div>
+</div>
+
+<!-- 5. Установка -->
+<div id="install-modal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header"><h3>📲 Установка</h3><button class="close-btn" onclick="closeInstall()">&times;</button></div>
+        <div class="modal-body"><div class="info-text">
+            <h2>Android 📱</h2>
+            <p>Chrome -> Меню (3 точки) -> "Установить приложение".</p>
+            <h2>iOS (iPhone) 📱</h2>
+            <p>Safari -> Поделиться -> "На экран Домой".</p>
+            <h2>Компьютер 💻</h2>
+            <p>Chrome -> Значок установки в адресной строке.</p>
+        </div></div>
+    </div>
+</div>
+
+<!-- 6. Кофе-медитация -->
+<div id="meditation-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>☕ Кофе-медитация</h3><button class="close-btn" onclick="closeMeditation()">&times;</button></div>
+        <div class="modal-body"><p style="font-style: italic; color: #5D4037;">Радуйся добрым делам...</p><div id="meditation-list"></div></div>
+    </div>
+</div>
+
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleFileImport(event)">
+
+<script>
+    // --- БАЗА ДАННЫХ ---
+    const DB = {
+        getGoals: () => JSON.parse(localStorage.getItem('goals') || '[]'),
+        saveGoals: (data) => localStorage.setItem('goals', JSON.stringify(data)),
+        getSeeds: () => JSON.parse(localStorage.getItem('seeds') || '[]'),
+        saveSeeds: (data) => localStorage.setItem('seeds', JSON.stringify(data)),
+        getConfig: () => JSON.parse(localStorage.getItem('config') || '{"time": "22:00", "notify": false}'),
+        saveConfig: (data) => localStorage.setItem('config', JSON.stringify(data)),
+    };
+
+    let currentTab = 'goals';
+    let deleteTimers = {}; 
+
+    function render() { renderGoals(); renderPlanting(); renderDone(); renderHarvest(); renderSettings(); }
+    function switchTab(tabName, element) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.getElementById('tab-' + tabName).style.display = 'block';
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        if(element) element.classList.add('active');
+    }
+    function escapeHtml(text) { if (!text) return ""; return String(text).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]); }
+
+    function handleDeleteClick(type, id, btnElement) {
+        const key = type + id;
+        if (deleteTimers[key]) { clearTimeout(deleteTimers[key]); delete deleteTimers[key]; if (type === 'goal') deleteGoalNow(id); else deleteSeedNow(id); } 
+        else { btnElement.classList.add('btn-delete-confirm'); btnElement.innerText = "Точно?"; deleteTimers[key] = setTimeout(() => { btnElement.classList.remove('btn-delete-confirm'); btnElement.innerText = "Удалить"; delete deleteTimers[key]; }, 3000); }
+    }
+    function deleteGoalNow(id) { DB.saveGoals(DB.getGoals().filter(g => g.id !== id)); render(); }
+    function deleteSeedNow(id) { DB.saveSeeds(DB.getSeeds().filter(s => s.id !== id)); render(); }
+
+    function renderGoals() {
+        const container = document.getElementById('tab-goals'); const goals = DB.getGoals().filter(g => !g.completed); const allSeeds = DB.getSeeds();
+        if (goals.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏔</div>Твои вершины ждут покорения</div>'; return; }
+        container.innerHTML = goals.map(g => {
+            const relatedSeeds = allSeeds.filter(s => s.goalId === g.id); const plannedCount = relatedSeeds.filter(s => !s.isActionDone).length; const doneCount = relatedSeeds.filter(s => s.isActionDone && !s.isGoalAchieved).length;
+            return `<div class="card"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div>
+            <div class="counters-container"><div class="counter-badge ${plannedCount === 0 ? 'zero' : ''}" onclick="showSeedsList(${g.id}, 'planned')">🌱 Посев: ${plannedCount}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="showSeedsList(${g.id}, 'done')">🙏 Сделано: ${doneCount}</div></div>
+            <div class="card-actions"><button class="btn btn-warning" onclick="openEditGoalModal(${g.id})">✎</button><button class="btn btn-success" onclick="achieveGoal(${g.id})">✓</button><button class="btn btn-danger" onclick="handleDeleteClick('goal', ${g.id}, this)">Удалить</button></div></div></div>`;
+        }).join('');
+    }
+    
+    function renderPlanting() {
+        const container = document.getElementById('tab-planting'); const seeds = DB.getSeeds().filter(s => !s.isActionDone);
+        if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div>Время посадки</div>'; return; }
+        container.innerHTML = seeds.map(s => `<div class="card"><div class="card-body"><div class="card-meta">🎯 ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
+        <div class="card-actions"><button class="btn btn-warning" onclick="openEditSeedModal(${s.id})">✎</button><button class="btn btn-success" onclick="completeSeedAction(${s.id})">✓ Сделано</button><button class="btn btn-danger" onclick="handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    }
+    function renderDone() {
+        const container = document.getElementById('tab-done'); const seeds = DB.getSeeds().filter(s => s.isActionDone && !s.isGoalAchieved);
+        if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🙏</div>Список пуст</div>'; return; }
+        container.innerHTML = seeds.map(s => `<div class="card"><div class="card-body"><div class="card-meta">🎯 ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
+        <div class="card-actions"><button class="btn btn-primary" onclick="undoSeedAction(${s.id})">↩ Вернуть</button><button class="btn btn-danger" onclick="handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    }
+    function renderHarvest() {
+        const container = document.getElementById('tab-harvest'); const seeds = DB.getSeeds().filter(s => s.isGoalAchieved);
+        if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🌾</div>Урожай созреет скоро</div>'; return; }
+        container.innerHTML = seeds.map(s => `<div class="card" style="border-left-color: var(--success-color);"><div class="card-body"><div class="card-title" style="color: var(--success-color);">Урожай: ${escapeHtml(s.goalText)}</div><div class="card-text">Для <b>${escapeHtml(s.person)}</b>: ${escapeHtml(s.action)}</div>
+        <div class="card-actions"><button class="btn btn-danger" onclick="handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    }
+    function showSeedsList(goalId, type) {
+        const seeds = DB.getSeeds().filter(s => s.goalId === goalId); let list = []; let title = "";
+        if (type === 'planned') { list = seeds.filter(s => !s.isActionDone); title = "🌱 Запланированные"; } else { list = seeds.filter(s => s.isActionDone && !s.isGoalAchieved); title = "🙏 Сделанные"; }
+        const body = document.getElementById('modal-body'); const header = document.getElementById('modal-title'); header.innerText = title;
+        if (list.length === 0) { body.innerHTML = '<p style="text-align:center; color:#8D6E63">Список пуст</p>'; } else { body.innerHTML = list.map(s => `<div class="seed-list-item ${type === 'done' ? 'done-item' : ''}"><div><b>Для кого:</b> ${escapeHtml(s.person)}</div><div><b>Действие:</b> ${escapeHtml(s.action)}</div></div>`).join(''); }
+        document.getElementById('modal').classList.add('active');
+    }
+    
+    function renderSettings() {
+        const container = document.getElementById('tab-settings'); const config = DB.getConfig();
+        container.innerHTML = `
+            <h3 style="font-family: 'Cormorant Garamond', serif; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">⚙️ Настройки</h3>
+            <div class="settings-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;"><label style="margin: 0;">Уведомления</label><label class="toggle-switch"><input type="checkbox" id="notify-toggle" ${config.notify ? 'checked' : ''} onchange="toggleNotification(this.checked)"><span class="slider"></span></label></div>
+                <div><label>Время напоминания</label><input type="time" id="reminder-time" value="${config.time}" onchange="updateTime(this.value)" style="margin-bottom: 0;"></div>
+                <p class="dev-warning">⚠️ Уведомления в разработке.</p>
+            </div>
+            <h3 style="font-family: 'Cormorant Garamond', serif; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-top: 30px;">💾 Резервная копия</h3>
+            <div class="settings-group" style="text-align: center;">
+                <button class="btn-action" onclick="exportData()">📤 Экспорт данных</button>
+                <button class="btn-action import" onclick="document.getElementById('import-file-input').click()">📥 Импорт данных</button>
+            </div>
+            <button class="btn-action secondary" style="margin-top: 30px;" onclick="openInfoMenu()">📜 О приложении</button>`;
+    }
+
+    function openInfoMenu() { document.getElementById('info-menu-modal').classList.add('active'); }
+    function closeInfoMenu() { document.getElementById('info-menu-modal').classList.remove('active'); }
+    function openInstruction() { document.getElementById('instruction-modal').classList.add('active'); }
+    function closeInstruction() { document.getElementById('instruction-modal').classList.remove('active'); }
+    function openPrivacy() { document.getElementById('privacy-modal').classList.add('active'); }
+    function closePrivacy() { document.getElementById('privacy-modal').classList.remove('active'); }
+    function openInstall() { document.getElementById('install-modal').classList.add('active'); }
+    function closeInstall() { document.getElementById('install-modal').classList.remove('active'); }
+    function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
+    function exportData() { const data = { goals: DB.getGoals(), seeds: DB.getSeeds(), config: DB.getConfig(), exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'saddharma_backup_' + new Date().toLocaleDateString('ru-RU').replace(/\./g, '-') + '.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+    function handleFileImport(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.goals && data.seeds) { if(confirm('Загрузить данные?')) { DB.saveGoals(data.goals); DB.saveSeeds(data.seeds); if(data.config) DB.saveConfig(data.config); alert('Готово!'); render(); } } else alert('Неверный формат'); } catch (err) { alert('Ошибка'); } }; reader.readAsText(file); event.target.value = ''; }
+    function toggleNotification(enabled) { let config = DB.getConfig(); config.notify = enabled; DB.saveConfig(config); alert('В разработке.'); }
+    function updateTime(time) { let config = DB.getConfig(); config.time = time; DB.saveConfig(config); }
+    
+    function openModal() { if(currentTab === 'harvest' || currentTab === 'done' || currentTab === 'settings') return; const body = document.getElementById('modal-body'); const title = document.getElementById('modal-title'); if (currentTab === 'goals') { title.innerText = "Новая цель"; body.innerHTML = `<label>Что исправить?</label><input type="text" id="input-fix"><label>Что получить?</label><input type="text" id="input-want"><button class="btn btn-success" style="width:100%" onclick="saveGoal()">Сохранить</button>`; } else if (currentTab === 'planting') { const activeGoals = DB.getGoals().filter(g => !g.completed); if (activeGoals.length === 0) { alert('Нет активных целей!'); return; } const options = activeGoals.map(g => `<option value="${g.id}">${escapeHtml(g.desire)}</option>`).join(''); title.innerText = "Посеять семя"; body.innerHTML = `<label>Цель</label><select id="input-goal-id">${options}</select><label>Имя человека</label><input type="text" id="input-person"><label>Действие</label><input type="text" id="input-action"><button class="btn btn-success" style="width:100%" onclick="saveSeed()">Сохранить</button>`; } document.getElementById('modal').classList.add('active'); }
+
+    function saveGoal() { const fix = document.getElementById('input-fix').value; const want = document.getElementById('input-want').value; if (!fix || !want) return alert('Заполни поля'); const goals = DB.getGoals(); goals.push({ id: Date.now(), problem: fix, desire: want, completed: false }); DB.saveGoals(goals); closeModal(); render(); }
+    function openEditGoalModal(id) { const goal = DB.getGoals().find(g => g.id === id); if(!goal) return; document.getElementById('modal-title').innerText = "Редактировать цель"; document.getElementById('modal-body').innerHTML = `<label>Что исправить?</label><input type="text" id="input-fix" value="${escapeHtml(goal.problem)}"><label>Что получить?</label><input type="text" id="input-want" value="${escapeHtml(goal.desire)}"><button class="btn btn-success" style="width:100%" onclick="saveEditedGoal(${id})">Сохранить</button>`; document.getElementById('modal').classList.add('active'); }
+    function saveEditedGoal(id) { let goals = DB.getGoals(); const newFix = document.getElementById('input-fix').value; const newWant = document.getElementById('input-want').value; if(!newFix || !newWant) return alert('Заполни поля'); goals = goals.map(g => g.id === id ? {...g, problem: newFix, desire: newWant} : g); let seeds = DB.getSeeds().map(s => s.goalId === id ? {...s, goalText: newWant} : s); DB.saveGoals(goals); DB.saveSeeds(seeds); closeModal(); render(); }
+    function achieveGoal(id) { if(!confirm('Достигнута цель?')) return; let goals = DB.getGoals().map(g => g.id === id ? {...g, completed: true} : g); let seeds = DB.getSeeds().map(s => s.goalId === id ? {...s, isGoalAchieved: true} : s); DB.saveGoals(goals); DB.saveSeeds(seeds); render(); }
+    
+    function saveSeed() { const goalId = parseInt(document.getElementById('input-goal-id').value); const goalObj = DB.getGoals().find(g => g.id === goalId); const person = document.getElementById('input-person').value; const action = document.getElementById('input-action').value; if (!person || !action) return alert('Заполни поля'); const seeds = DB.getSeeds(); seeds.push({ id: Date.now(), goalId: goalId, goalText: goalObj.desire, person: person, action: action, isActionDone: false, isGoalAchieved: false }); DB.saveSeeds(seeds); closeModal(); render(); }
+    function openEditSeedModal(id) { const seed = DB.getSeeds().find(s => s.id === id); if(!seed) return; const activeGoals = DB.getGoals().filter(g => !g.completed); const options = activeGoals.map(g => `<option value="${g.id}" ${g.id === seed.goalId ? 'selected' : ''}>${escapeHtml(g.desire)}</option>`).join(''); document.getElementById('modal-title').innerText = "Редактировать семя"; document.getElementById('modal-body').innerHTML = `<label>Цель</label><select id="input-goal-id">${options}</select><label>Имя</label><input type="text" id="input-person" value="${escapeHtml(seed.person)}"><label>Действие</label><input type="text" id="input-action" value="${escapeHtml(seed.action)}"><button class="btn btn-success" style="width:100%" onclick="saveEditedSeed(${id})">Сохранить</button>`; document.getElementById('modal').classList.add('active'); }
+    function saveEditedSeed(id) { const newGoalId = parseInt(document.getElementById('input-goal-id').value); const newGoalObj = DB.getGoals().find(g => g.id === newGoalId); const newPerson = document.getElementById('input-person').value; const newAction = document.getElementById('input-action').value; if(!newPerson || !newAction) return alert('Заполни поля'); let seeds = DB.getSeeds().map(s => s.id === id ? {...s, goalId: newGoalId, goalText: newGoalObj.desire, person: newPerson, action: newAction} : s); DB.saveSeeds(seeds); closeModal(); render(); }
+
+    function completeSeedAction(id) { let seeds = DB.getSeeds().map(s => s.id === id ? {...s, isActionDone: true} : s); DB.saveSeeds(seeds); render(); }
+    function undoSeedAction(id) { let seeds = DB.getSeeds().map(s => s.id === id ? {...s, isActionDone: false} : s); DB.saveSeeds(seeds); render(); }
+
+    function openMeditation() { const seeds = DB.getSeeds().filter(s => s.isActionDone && !s.isGoalAchieved); const mList = document.getElementById('meditation-list'); if (seeds.length === 0) { mList.innerHTML = '<p style="text-align:center; color:#8D6E63">Нет добрых дел.</p>'; } else { mList.innerHTML = seeds.map(s => `<div style="background: #fff; border-left: 3px solid var(--success-color); padding: 10px; margin-bottom: 10px; font-size: 14px;">Я сделал для <b>${escapeHtml(s.person)}</b>: ${escapeHtml(s.action)}.<br><span style="font-size: 12px; color: var(--text-light);">Чтобы получить: ${escapeHtml(s.goalText)}</span></div>`).join(''); } document.getElementById('meditation-modal').classList.add('active'); }
+    function closeMeditation() { document.getElementById('meditation-modal').classList.remove('active'); }
+
+    render();
+</script>
+
+<script>
+    function updateApp() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg && reg.waiting) { reg.waiting.postMessage('skipWaiting'); }
+            });
+        }
+        document.getElementById('update-notification').style.display = 'none';
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(registration) {
+                    console.log('✅ SW зарегистрирован:', registration.scope);
+                    if (registration.waiting) { document.getElementById('update-notification').style.display = 'block'; }
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                document.getElementById('update-notification').style.display = 'block';
+                            }
+                        });
+                    });
+                })
+                .catch(function(error) { console.log('❌ Ошибка SW:', error); });
+        });
+        navigator.serviceWorker.addEventListener('controllerchange', function() { window.location.reload(); });
+    }
+</script>
+
+</body>
+</html>
