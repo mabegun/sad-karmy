@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#5D4037">
+    <meta name="description" content="Приложение для практики кармических семян по книгам Майкла Роуча">
+    
+    <!-- PWA для iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Сад Кармы">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
     <link rel="manifest" href="manifest.json">
     <title>Сад Кармы</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -537,6 +545,7 @@
 </script>
 
 <script>
+    // === PWA: Регистрация Service Worker ===
     function updateApp() {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistration().then(reg => {
@@ -548,22 +557,29 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js')
+            // ВАЖНО: Правильный путь для GitHub Pages!
+            navigator.serviceWorker.register('/sad-karmy/service-worker.js')
                 .then(function(registration) {
                     console.log('✅ SW зарегистрирован:', registration.scope);
-                    if (registration.waiting) { document.getElementById('update-notification').style.display = 'block'; }
-                    registration.addEventListener('updatefound', () => {
+                    if (registration.waiting) { 
+                        document.getElementById('update-notification').style.display = 'block'; 
+                    }
+                    registration.addEventListener('updatefound', function() {
                         const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
+                        newWorker.addEventListener('statechange', function() {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                 document.getElementById('update-notification').style.display = 'block';
                             }
                         });
                     });
                 })
-                .catch(function(error) { console.log('❌ Ошибка SW:', error); });
+                .catch(function(error) { 
+                    console.log('❌ Ошибка SW:', error); 
+                });
         });
-        navigator.serviceWorker.addEventListener('controllerchange', function() { window.location.reload(); });
+        navigator.serviceWorker.addEventListener('controllerchange', function() { 
+            window.location.reload(); 
+        });
     }
 </script>
 
