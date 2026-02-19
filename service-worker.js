@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saddharma-app-v6';
+const CACHE_NAME = 'saddharma-app-v7';
 
 const ASSETS = [
   '/sad-karmy/',
