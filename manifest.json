@@ -2,11 +2,12 @@
   "name": "Сад Кармы",
   "short_name": "Сад Кармы",
   "description": "Приложение для практики кармических семян по книгам Майкла Роуча",
-  "start_url": "/",
+  "start_url": "/sad-karmy/",
   "display": "standalone",
   "background_color": "#F5F1E6",
   "theme_color": "#5D4037",
   "orientation": "portrait",
+  "scope": "/sad-karmy/",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
