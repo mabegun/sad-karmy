@@ -149,8 +149,6 @@
         .info-menu-btn { display: block; width: 100%; padding: 20px; margin-bottom: 10px; background: rgba(255,255,255,0.5); border: 1px solid #D7CCC8; text-align: left; font-family: 'Lora', serif; font-size: 16px; color: var(--text-ink); border-radius: 5px; cursor: pointer; transition: 0.2s; }
         .info-menu-btn:hover { background: #fff; border-color: var(--accent-color); }
         .info-menu-btn span { font-size: 20px; margin-right: 10px; vertical-align: middle; }
-        
-        .info-menu-btn.update-available { border-color: var(--success-color); background: rgba(46, 125, 50, 0.1); }
 
         .seed-list-item { background: rgba(255,255,255,0.6); border-left: 3px solid var(--accent-color); padding: 10px; margin-bottom: 8px; font-size: 14px; }
         .seed-list-item.done-item { border-left-color: var(--success-color); background: rgba(46, 125, 50, 0.05); }
@@ -163,7 +161,7 @@
         input:checked + .slider { background-color: var(--success-color); }
         input:checked + .slider:before { transform: translateX(22px); }
         
-        .btn-action { width: 100%; padding: 15px; font-size: 16px; font-weight: 600; background: linear-gradient(to right, #5D4037, #3E2723); color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 5px; margin-bottom: 10px; cursor: pointer; }
+        .btn-action { width: 100%; padding: 15px; font-size: 16px; font-weight: 600; background: linear-gradient(to right, #5D4037, #3E2723); color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 5px; margin-bottom: 10px; cursor: pointer; font-family: 'Lora', serif; }
         .btn-action:hover { opacity: 0.9; }
         .btn-action.import { background: transparent; color: var(--text-ink); border: 1px solid #D7CCC8; }
         .btn-action.secondary { background: transparent; color: var(--text-light); border: 1px solid #D7CCC8; }
@@ -176,6 +174,7 @@
         .version-status.checking { background: #FFF3E0; color: #E65100; }
         .version-status.updated { background: #E8F5E9; color: var(--success-color); }
         .version-status.available { background: #FFF8E1; color: #F57F17; }
+        .version-status.error { background: #FFEBEE; color: var(--danger-color); }
 
         /* Плашка обновления */
         #update-notification { display: none; position: fixed; bottom: 80px; left: 20px; right: 20px; background: var(--accent-color); color: #3E2723; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; text-align: center; font-weight: bold; border: 2px solid #fff; }
@@ -232,8 +231,8 @@
             <!-- Блок версии -->
             <div class="version-box">
                 <div class="version-label">Версия приложения</div>
-                <div class="version-number" id="app-version">1.0.0</div>
-                <div class="version-status updated" id="version-status">✓ Актуальная версия</div>
+                <div class="version-number" id="app-version">...</div>
+                <div class="version-status updated" id="version-status">⏳ Загрузка...</div>
             </div>
             
             <!-- Кнопки управления -->
@@ -269,34 +268,17 @@
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header"><h3>📖 Инструкция</h3><button class="close-btn" onclick="closeInstruction()">&times;</button></div>
         <div class="modal-body"><div class="info-text">
-            <h2>Инструкция по работе с приложением 🌱</h2>
-            <p>Привет! Это приложение поможет тебе изменить свою жизнь, используя древние знания о карме. <b>Главное правило</b>, с которого всё начинается: <span class="highlight">всё исходит из кармических семян в нашем уме</span>.</p>
+            <h2>Инструкция 🌱</h2>
+            <p>Привет! Это приложение поможет тебе изменить свою жизнь. <b>Главное правило:</b> <span class="highlight">всё исходит из кармических семян в нашем уме</span>.</p>
 
-            <h2>Пошаговая инструкция 🧭</h2>
-
-            <div class="instruction-step">
-                <h3>Шаг 1. Ставим цель 🎯</h3>
-                <p>Определи, что хочешь получить. Зайди в раздел <b>«Цели»</b> и создай новую цель.</p>
-            </div>
-
-            <div class="instruction-step">
-                <h3>Шаг 2. Сажаем семена 🌱</h3>
-                <p><b>Правило:</b> чтобы получить — нужно отдать. Найди человека с похожей потребностью и помоги ему. Зайди в раздел <b>«Посев»</b>.</p>
-            </div>
-
-            <div class="instruction-step">
-                <h3>Шаг 3. Делаем! ✅</h3>
-                <p>Выполни запланированное и нажми <b>«Сделано»</b>.</p>
-            </div>
-
-            <div class="instruction-step">
-                <h3>Шаг 4. Кофе-медитация ☕</h3>
-                <p>Каждый вечер радуйся сделанным добрым делам. Это самый важный шаг!</p>
-            </div>
+            <h2>Шаги 🧭</h2>
+            <div class="instruction-step"><h3>1. Цель 🎯</h3><p>Определи, что хочешь получить. Раздел «Цели».</p></div>
+            <div class="instruction-step"><h3>2. Посев 🌱</h3><p>Помоги другому человеку с похожей потребностью.</p></div>
+            <div class="instruction-step"><h3>3. Сделано ✅</h3><p>Выполни и нажми «Сделано».</p></div>
+            <div class="instruction-step"><h3>4. Медитация ☕</h3><p>Радуйся добрым делам каждый вечер.</p></div>
             
             <div class="instruction-step" style="border-left-color: var(--success-color);">
-                <h3>💾 Бэкап данных</h3>
-                <p>Используй Экспорт в Настройках для резервной копии.</p>
+                <h3>💾 Бэкап</h3><p>Экспорт в Настройках сохранит данные.</p>
             </div>
         </div></div>
     </div>
@@ -308,18 +290,10 @@
         <div class="modal-header"><h3>🔒 Конфиденциальность</h3><button class="close-btn" onclick="closePrivacy()">&times;</button></div>
         <div class="modal-body"><div class="info-text">
             <h2>Привет! 🌿</h2>
-            <p>Это приложение создано по мотивам книг Майкла Роуча.</p>
-            
+            <p>Приложение по книгам Майкла Роуча.</p>
             <h2>Безопасность 🔒</h2>
-            <ul>
-                <li>Мы <b>не собираем</b> личную информацию.</li>
-                <li>Нет аналитики.</li>
-                <li>Данные только в твоём браузере.</li>
-            </ul>
-            
-            <div class="warning-box">
-                <b>⚠️ Важно:</b> При смене браузера данные потеряются. Используй Экспорт/Импорт!
-            </div>
+            <ul><li>Не собираем данные.</li><li>Нет аналитики.</li><li>Данные только в твоём браузере.</li></ul>
+            <div class="warning-box"><b>⚠️ Важно:</b> При смене браузера данные потеряются. Используй Экспорт!</div>
         </div></div>
     </div>
 </div>
@@ -329,14 +303,9 @@
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header"><h3>📲 Установка</h3><button class="close-btn" onclick="closeInstall()">&times;</button></div>
         <div class="modal-body"><div class="info-text">
-            <h2>Android 📱</h2>
-            <p>Chrome → Меню → «Установить приложение»</p>
-            
-            <h2>iOS 📱</h2>
-            <p>Safari → Поделиться → «На экран Домой»</p>
-            
-            <h2>Компьютер 💻</h2>
-            <p>Chrome → Значок установки в адресной строке</p>
+            <h2>Android 📱</h2><p>Chrome → Меню → «Установить приложение»</p>
+            <h2>iOS 📱</h2><p>Safari → Поделиться → «На экран Домой»</p>
+            <h2>ПК 💻</h2><p>Chrome → Значок установки в адресной строке</p>
         </div></div>
     </div>
 </div>
@@ -352,10 +321,11 @@
 <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleFileImport(event)">
 
 <script>
-    // === ВЕРСИЯ ПРИЛОЖЕНИЯ ===
-    const APP_VERSION = '1.1.0';
-    let updateAvailable = false;
+    // === СИСТЕМА ВЕРСИЙ ===
+    let currentVersion = '...';
+    let serverVersion = null;
     let swRegistration = null;
+    let updateAvailable = false;
 
     // --- БАЗА ДАННЫХ ---
     const DB = {
@@ -455,12 +425,46 @@
     function closeInstall() { document.getElementById('install-modal').classList.remove('active'); }
     function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
-    // === ФУНКЦИИ ОБНОВЛЕНИЯ ===
-    function updateVersionDisplay() {
-        document.getElementById('app-version').textContent = APP_VERSION;
-        
+    // === ФУНКЦИИ ВЕРСИЙ ===
+    async function getVersionFromSW() {
+        return new Promise((resolve) => {
+            if (!navigator.serviceWorker.controller) {
+                resolve(null);
+                return;
+            }
+            
+            const messageChannel = new MessageChannel();
+            messageChannel.port1.onmessage = (event) => {
+                resolve(event.data.version);
+            };
+            
+            navigator.serviceWorker.controller.postMessage('GET_VERSION', [messageChannel.port2]);
+            
+            // Таймаут
+            setTimeout(() => resolve(null), 1000);
+        });
+    }
+
+    async function getServerVersion() {
+        try {
+            const response = await fetch('/sad-karmy/version.json?t=' + Date.now());
+            if (response.ok) {
+                const data = await response.json();
+                return data.version;
+            }
+        } catch (e) {
+            console.log('Не удалось получить версию с сервера');
+        }
+        return null;
+    }
+
+    async function updateVersionDisplay() {
+        const versionEl = document.getElementById('app-version');
         const statusEl = document.getElementById('version-status');
         const updateBtn = document.getElementById('update-btn');
+        
+        // Показываем текущую версию от SW
+        versionEl.textContent = currentVersion;
         
         if (updateAvailable) {
             statusEl.className = 'version-status available';
@@ -482,38 +486,36 @@
         checkBtn.disabled = true;
         
         try {
-            if ('serviceWorker' in navigator && swRegistration) {
+            // Получаем версию с сервера
+            serverVersion = await getServerVersion();
+            
+            // Принудительно обновляем SW
+            if (swRegistration) {
                 await swRegistration.update();
-                
-                // Проверяем статус после обновления
-                setTimeout(() => {
-                    updateVersionDisplay();
-                    checkBtn.disabled = false;
-                }, 1000);
-            } else {
-                // Если нет SW, просто показываем статус
-                setTimeout(() => {
-                    updateVersionDisplay();
-                    checkBtn.disabled = false;
-                }, 500);
             }
+            
+            // Сравниваем версии
+            if (serverVersion && serverVersion !== currentVersion) {
+                updateAvailable = true;
+            } else {
+                updateAvailable = false;
+            }
+            
+            updateVersionDisplay();
         } catch (error) {
-            console.error('Ошибка проверки:', error);
-            statusEl.className = 'version-status updated';
-            statusEl.textContent = '✓ Проверка завершена';
-            checkBtn.disabled = false;
+            statusEl.className = 'version-status error';
+            statusEl.textContent = '❌ Ошибка проверки';
         }
+        
+        checkBtn.disabled = false;
     }
 
     function updateApp() {
-        if ('serviceWorker' in navigator && swRegistration) {
-            if (swRegistration.waiting) {
-                swRegistration.waiting.postMessage('skipWaiting');
-            }
+        if (swRegistration && swRegistration.waiting) {
+            swRegistration.waiting.postMessage('skipWaiting');
         }
         document.getElementById('update-notification').style.display = 'none';
         updateAvailable = false;
-        updateVersionDisplay();
     }
 
     function exportData() { const data = { goals: DB.getGoals(), seeds: DB.getSeeds(), config: DB.getConfig(), exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'saddharma_backup_' + new Date().toLocaleDateString('ru-RU').replace(/\./g, '-') + '.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
@@ -540,38 +542,49 @@
 
     // === SERVICE WORKER ===
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sad-karmy/service-worker.js')
-                .then(function(registration) {
-                    console.log('✅ SW зарегистрирован:', registration.scope);
-                    swRegistration = registration;
-                    
-                    // Проверяем, есть ли ожидающее обновление
-                    if (registration.waiting) {
-                        updateAvailable = true;
-                        document.getElementById('update-notification').style.display = 'block';
-                    }
-                    
-                    // Слушаем новые обновления
-                    registration.addEventListener('updatefound', function() {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', function() {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                updateAvailable = true;
-                                document.getElementById('update-notification').style.display = 'block';
-                                updateVersionDisplay();
-                            }
-                        });
+        window.addEventListener('load', async function() {
+            try {
+                swRegistration = await navigator.serviceWorker.register('/sad-karmy/service-worker.js');
+                console.log('✅ SW зарегистрирован:', swRegistration.scope);
+                
+                // Получаем версию от SW
+                currentVersion = await getVersionFromSW() || '?.?.?';
+                
+                // Проверяем ожидающее обновление
+                if (swRegistration.waiting) {
+                    updateAvailable = true;
+                    document.getElementById('update-notification').style.display = 'block';
+                }
+                
+                // Слушаем обновления
+                swRegistration.addEventListener('updatefound', function() {
+                    const newWorker = swRegistration.installing;
+                    newWorker.addEventListener('statechange', async function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            updateAvailable = true;
+                            document.getElementById('update-notification').style.display = 'block';
+                            // Получаем новую версию
+                            currentVersion = await getVersionFromSW() || currentVersion;
+                        }
                     });
-                })
-                .catch(function(error) { 
-                    console.log('❌ Ошибка SW:', error); 
                 });
+            } catch (error) {
+                console.log('❌ Ошибка SW:', error);
+                currentVersion = '?.?.?';
+            }
+        });
+        
+        // Слушаем сообщения от SW
+        navigator.serviceWorker.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'VERSION') {
+                currentVersion = event.data.version;
+                updateVersionDisplay();
+            }
         });
         
         // Перезагрузка при смене контроллера
-        navigator.serviceWorker.addEventListener('controllerchange', function() { 
-            window.location.reload(); 
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+            window.location.reload();
         });
     }
 
