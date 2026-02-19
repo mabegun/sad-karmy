@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saddharma-app-v2'; // Меняйте v1 на v2, v3 при обновлении кода
+const CACHE_NAME = 'saddharma-app-v3'; // Меняйте v1 на v2, v3 при обновлении кода
 const ASSETS = [
   '/',
   '/index.html',
