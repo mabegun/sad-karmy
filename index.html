@@ -228,7 +228,7 @@
 
 <!-- 1. Меню "О приложении" -->
 <div id="info-menu-modal" class="modal">
-    <div class="modal-content" style="max-width: 350px;">
+    <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">
             <h3>ℹ️ О приложении</h3>
             <button class="close-btn" onclick="closeInfoMenu()">&times;</button>
@@ -253,6 +253,12 @@
             </div>
             
             <hr style="border: none; border-top: 1px solid #D7CCC8; margin: 20px 0;">
+            
+            <!-- Информация об авторе идеи -->
+            <div style="background: rgba(255,255,255,0.7); border: 1px solid #D7CCC8; border-radius: 8px; padding: 12px; margin-bottom: 15px; text-align: left; font-size: 13px; line-height: 1.5;">
+                <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">📚 На основе учения Майкла Роуча</div>
+                <p style="margin: 0; color: var(--text-light);">Это приложение создано по книгам Геше Майкла Роуча — первого американца, получившего степень Геше в тибетском монастыре. Его книги «Алмазный огранщик», «Кармический менеджмент» и «Йога семени» раскрывают древние знания о том, как наши действия формируют реальность.</p>
+            </div>
             
             <button class="info-menu-btn" onclick="closeInfoMenu(); openInstruction();"><span>📖</span> Инструкция</button>
             <button class="info-menu-btn" onclick="closeInfoMenu(); openPrivacy();"><span>📜</span> Конфиденциальность</button>
@@ -676,15 +682,96 @@
     function toggleNotification(enabled) { let config = DB.getConfig(); config.notify = enabled; DB.saveConfig(config); alert('В разработке.'); }
     function updateTime(time) { let config = DB.getConfig(); config.time = time; DB.saveConfig(config); }
     
-    function openModal() { if(currentTab === 'harvest' || currentTab === 'done' || currentTab === 'settings') return; const body = document.getElementById('modal-body'); const title = document.getElementById('modal-title'); if (currentTab === 'goals') { title.innerText = "Новая цель"; body.innerHTML = `<label>Что исправить?</label><input type="text" id="input-fix"><label>Что получить?</label><input type="text" id="input-want"><button class="btn btn-success" style="width:100%" onclick="saveGoal()">Сохранить</button>`; } else if (currentTab === 'planting') { const activeGoals = DB.getGoals().filter(g => !g.completed); if (activeGoals.length === 0) { alert('Нет активных целей!'); return; } const options = activeGoals.map(g => `<option value="${g.id}">${escapeHtml(g.desire)}</option>`).join(''); title.innerText = "Посеять семя"; body.innerHTML = `<label>Цель</label><select id="input-goal-id">${options}</select><label>Имя человека</label><input type="text" id="input-person"><label>Действие</label><input type="text" id="input-action"><button class="btn btn-success" style="width:100%" onclick="saveSeed()">Сохранить</button>`; } document.getElementById('modal').classList.add('active'); }
+    function openModal() {
+        if(currentTab === 'harvest' || currentTab === 'done' || currentTab === 'settings') return;
+        const body = document.getElementById('modal-body');
+        const title = document.getElementById('modal-title');
+        
+        if (currentTab === 'goals') {
+            title.innerText = "Новая цель 🎯";
+            body.innerHTML = `
+                <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--accent-color); padding: 12px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; border-radius: 4px;">
+                    <b>Шаг 1. Ставим цель</b><br>
+                    Выбери то, что тебя сейчас не устраивает в жизни. Сформулируй, <b>чего ты хочешь</b> получить положительного взамен.<br>
+                    <i>Пример: «Хочу больше клиентов» или «Хочу чувствовать себя увереннее в отношениях».</i>
+                </div>
+                <label>Что не устраивает в жизни и хочется исправить?</label>
+                <input type="text" id="input-fix" placeholder="Например: нехватка денег, одиночество...">
+                <label>Что хочешь получить взамен?</label>
+                <input type="text" id="input-want" placeholder="Например: стабильный доход, близкие отношения...">
+                <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="saveGoal()">Сохранить цель</button>
+                <a href="#" onclick="closeModal(); openInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">📖 Открыть полную инструкцию</a>
+            `;
+        } else if (currentTab === 'planting') {
+            const activeGoals = DB.getGoals().filter(g => !g.completed);
+            if (activeGoals.length === 0) { alert('Сначала создайте цель!'); return; }
+            const options = activeGoals.map(g => `<option value="${g.id}">${escapeHtml(g.desire)}</option>`).join('');
+            title.innerText = "Посеять семя 🌱";
+            body.innerHTML = `
+                <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--accent-color); padding: 12px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; border-radius: 4px;">
+                    <b>Шаг 2. Сажаем семена</b><br>
+                    <b>Правило кармы:</b> чтобы получить что-то, нужно сначала это отдать.<br>
+                    Найди человека, которому тоже нужно то, что хочешь получить ты. Придумай, как именно ты ему поможешь.<br>
+                    <i>Например: хочешь больше клиентов — помоги коллеге найти стажёра.</i>
+                </div>
+                <label>Для какой цели сеем?</label>
+                <select id="input-goal-id">${options}</select>
+                <label>Для кого делаем доброе дело?</label>
+                <input type="text" id="input-person" placeholder="Имя человека или описание группы">
+                <label>Какой поступок планируешь?</label>
+                <input type="text" id="input-action" placeholder="Опиши конкретное действие">
+                <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="saveSeed()">Сохранить семя</button>
+                <a href="#" onclick="closeModal(); openInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">📖 Открыть полную инструкцию</a>
+            `;
+        }
+        document.getElementById('modal').classList.add('active');
+    }
 
     function saveGoal() { const fix = document.getElementById('input-fix').value; const want = document.getElementById('input-want').value; if (!fix || !want) return alert('Заполни поля'); const goals = DB.getGoals(); goals.push({ id: Date.now(), problem: fix, desire: want, completed: false }); DB.saveGoals(goals); closeModal(); render(); }
-    function openEditGoalModal(id) { const goal = DB.getGoals().find(g => g.id === id); if(!goal) return; document.getElementById('modal-title').innerText = "Редактировать цель"; document.getElementById('modal-body').innerHTML = `<label>Что исправить?</label><input type="text" id="input-fix" value="${escapeHtml(goal.problem)}"><label>Что получить?</label><input type="text" id="input-want" value="${escapeHtml(goal.desire)}"><button class="btn btn-success" style="width:100%" onclick="saveEditedGoal(${id})">Сохранить</button>`; document.getElementById('modal').classList.add('active'); }
+    function openEditGoalModal(id) {
+        const goal = DB.getGoals().find(g => g.id === id);
+        if(!goal) return;
+        document.getElementById('modal-title').innerText = "Редактировать цель 🎯";
+        document.getElementById('modal-body').innerHTML = `
+            <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--accent-color); padding: 12px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; border-radius: 4px;">
+                <b>Шаг 1. Ставим цель</b><br>
+                Уточни, что тебя не устраивает и чего ты хочешь достичь.
+            </div>
+            <label>Что не устраивает в жизни и хочется исправить?</label>
+            <input type="text" id="input-fix" value="${escapeHtml(goal.problem)}">
+            <label>Что хочешь получить взамен?</label>
+            <input type="text" id="input-want" value="${escapeHtml(goal.desire)}">
+            <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="saveEditedGoal(${id})">Сохранить изменения</button>
+            <a href="#" onclick="closeModal(); openInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">📖 Открыть полную инструкцию</a>
+        `;
+        document.getElementById('modal').classList.add('active');
+    }
     function saveEditedGoal(id) { let goals = DB.getGoals(); const newFix = document.getElementById('input-fix').value; const newWant = document.getElementById('input-want').value; if(!newFix || !newWant) return alert('Заполни поля'); goals = goals.map(g => g.id === id ? {...g, problem: newFix, desire: newWant} : g); let seeds = DB.getSeeds().map(s => s.goalId === id ? {...s, goalText: newWant} : s); DB.saveGoals(goals); DB.saveSeeds(seeds); closeModal(); render(); }
     function achieveGoal(id) { if(!confirm('Достигнута цель?')) return; let goals = DB.getGoals().map(g => g.id === id ? {...g, completed: true} : g); let seeds = DB.getSeeds().map(s => s.goalId === id ? {...s, isGoalAchieved: true} : s); DB.saveGoals(goals); DB.saveSeeds(seeds); render(); }
     
     function saveSeed() { const goalId = parseInt(document.getElementById('input-goal-id').value); const goalObj = DB.getGoals().find(g => g.id === goalId); const person = document.getElementById('input-person').value; const action = document.getElementById('input-action').value; if (!person || !action) return alert('Заполни поля'); const seeds = DB.getSeeds(); seeds.push({ id: Date.now(), goalId: goalId, goalText: goalObj.desire, person: person, action: action, isActionDone: false, isGoalAchieved: false }); DB.saveSeeds(seeds); closeModal(); render(); }
-    function openEditSeedModal(id) { const seed = DB.getSeeds().find(s => s.id === id); if(!seed) return; const activeGoals = DB.getGoals().filter(g => !g.completed); const options = activeGoals.map(g => `<option value="${g.id}" ${g.id === seed.goalId ? 'selected' : ''}>${escapeHtml(g.desire)}</option>`).join(''); document.getElementById('modal-title').innerText = "Редактировать семя"; document.getElementById('modal-body').innerHTML = `<label>Цель</label><select id="input-goal-id">${options}</select><label>Имя</label><input type="text" id="input-person" value="${escapeHtml(seed.person)}"><label>Действие</label><input type="text" id="input-action" value="${escapeHtml(seed.action)}"><button class="btn btn-success" style="width:100%" onclick="saveEditedSeed(${id})">Сохранить</button>`; document.getElementById('modal').classList.add('active'); }
+    function openEditSeedModal(id) {
+        const seed = DB.getSeeds().find(s => s.id === id);
+        if(!seed) return;
+        const activeGoals = DB.getGoals().filter(g => !g.completed);
+        const options = activeGoals.map(g => `<option value="${g.id}" ${g.id === seed.goalId ? 'selected' : ''}>${escapeHtml(g.desire)}</option>`).join('');
+        document.getElementById('modal-title').innerText = "Редактировать семя 🌱";
+        document.getElementById('modal-body').innerHTML = `
+            <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--accent-color); padding: 12px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; border-radius: 4px;">
+                <b>Шаг 2. Сажаем семена</b><br>
+                Уточни для кого и какой поступок планируешь совершить.
+            </div>
+            <label>Для какой цели сеем?</label>
+            <select id="input-goal-id">${options}</select>
+            <label>Для кого делаем доброе дело?</label>
+            <input type="text" id="input-person" value="${escapeHtml(seed.person)}">
+            <label>Какой поступок планируешь?</label>
+            <input type="text" id="input-action" value="${escapeHtml(seed.action)}">
+            <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="saveEditedSeed(${id})">Сохранить изменения</button>
+            <a href="#" onclick="closeModal(); openInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">📖 Открыть полную инструкцию</a>
+        `;
+        document.getElementById('modal').classList.add('active');
+    }
     function saveEditedSeed(id) { const newGoalId = parseInt(document.getElementById('input-goal-id').value); const newGoalObj = DB.getGoals().find(g => g.id === newGoalId); const newPerson = document.getElementById('input-person').value; const newAction = document.getElementById('input-action').value; if(!newPerson || !newAction) return alert('Заполни поля'); let seeds = DB.getSeeds().map(s => s.id === id ? {...s, goalId: newGoalId, goalText: newGoalObj.desire, person: newPerson, action: newAction} : s); DB.saveSeeds(seeds); closeModal(); render(); }
 
     function completeSeedAction(id) { let seeds = DB.getSeeds().map(s => s.id === id ? {...s, isActionDone: true} : s); DB.saveSeeds(seeds); render(); }
