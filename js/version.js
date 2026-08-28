@@ -188,16 +188,13 @@ export function initVersionSystem() {
             currentVersion = await getVersionFromSW() || '?.?.?';
             updateVersionDisplay();
             
-            // Автопроверка: сравниваем версию SW с версией на сервере
+            // Автопроверка: триггерим обновление SW если версия на сервере новее
+            // Уведомление покажет updatefound handler, а не этот код
             try {
                 const server = await getServerVersion();
-                if (server && server !== currentVersion) {
-                    console.log('\u2B06\uFE0F Версия на сервере (' + server + ') отличается от SW (' + currentVersion + ')');
-                    await swRegistration.update();
-                    await new Promise(r => setTimeout(r, 1500));
-                    if (!getWaitingWorker() && server !== currentVersion) {
-                        showUpdateNotification();
-                    }
+                if (server && currentVersion !== '?.?.?' && server !== currentVersion) {
+                    console.log('\u2B06\uFE0F Сервер: ' + server + ', SW: ' + currentVersion + ' — проверяем обновление');
+                    swRegistration.update();
                 }
             } catch (e) {
                 console.log('Автопроверка версии не удалась:', e);
