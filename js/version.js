@@ -113,6 +113,7 @@ export function initVersionSystem() {
                 console.log('✅ SW зарегистрирован:', swRegistration.scope);
                 
                 currentVersion = await getVersionFromSW() || '?.?.?';
+                updateVersionDisplay();
                 
                 if (swRegistration.waiting) {
                     waitingWorker = swRegistration.waiting;
@@ -134,6 +135,7 @@ export function initVersionSystem() {
             } catch (error) {
                 console.log('❌ Ошибка SW:', error);
                 currentVersion = '?.?.?';
+                updateVersionDisplay();
             }
         });
         
