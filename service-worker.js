@@ -1,13 +1,25 @@
 // === ВЕРСИЯ ПРИЛОЖЕНИЯ (менять только здесь!) ===
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '2.0.0';
 const CACHE_NAME = `saddharma-app-v${APP_VERSION}`;
 
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.svg',
-  '/version.json'
+  './',
+  './index.html',
+  './css/style.css',
+  './js/app.js',
+  './js/db.js',
+  './js/events.js',
+  './js/goals.js',
+  './js/meditation.js',
+  './js/modals.js',
+  './js/render.js',
+  './js/seeds.js',
+  './js/settings.js',
+  './js/utils.js',
+  './js/version.js',
+  './manifest.json',
+  './icon.svg',
+  './version.json'
 ];
 
 // Установка
@@ -16,7 +28,6 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(ASSETS))
-      // НЕ вызываем skipWaiting() - ждём пока пользователь нажмёт кнопку
   );
 });
 
@@ -34,7 +45,6 @@ self.addEventListener('activate', (event) => {
       }))
     ).then(() => self.clients.claim())
     .then(() => {
-      // Отправляем версию всем клиентам
       return self.clients.matchAll().then(clients => {
         clients.forEach(client => {
           client.postMessage({
@@ -60,13 +70,11 @@ self.addEventListener('fetch', (event) => {
 
 // Обработка сообщений от клиента
 self.addEventListener('message', (event) => {
-  // Обновление по кнопке пользователя
   if (event.data === 'skipWaiting') {
     console.log('SW: skipWaiting от пользователя');
     self.skipWaiting();
   }
   
-  // Отправляем версию по запросу
   if (event.data === 'GET_VERSION') {
     event.ports[0].postMessage({
       version: APP_VERSION
