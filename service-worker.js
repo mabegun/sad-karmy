@@ -1,5 +1,5 @@
 // === ВЕРСИЯ ПРИЛОЖЕНИЯ (менять только здесь!) ===
-const APP_VERSION = '2.3.3';
+const APP_VERSION = '2.4.0';
 const CACHE_NAME = `saddharma-app-v${APP_VERSION}`;
 
 const ASSETS = [
@@ -19,6 +19,8 @@ const ASSETS = [
   './js/version.js',
   './manifest.json',
   './icon.svg',
+  './icon-192x192.png',
+  './icon-512x512.png',
   './version.json'
 ];
 

@@ -8,7 +8,7 @@ export function saveGoal() {
     const want = document.getElementById('input-want').value;
     var bad1 = markInvalid('input-fix'), bad2 = markInvalid('input-want'); if (!fix || !want) return;
     const goals = DB.getGoals();
-    goals.push({ id: Date.now(), problem: fix, desire: want, completed: false });
+    goals.push({ id: Date.now(), problem: fix, desire: want, completed: false, createdAt: Date.now() });
     DB.saveGoals(goals);
     closeModal();
     triggerRender();

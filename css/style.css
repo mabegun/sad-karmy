@@ -59,7 +59,11 @@ body {
 .card-meta { font-size: 12px; margin-top: 10px; color: var(--accent-dark); font-style: italic; display: flex; align-items: center; gap: 5px; }
 .card-actions { display: flex; gap: 10px; margin-top: 12px; border-top: 1px solid #EFEBE9; padding-top: 12px; flex-wrap: wrap; }
 
-.counters-container { display: flex; gap: 10px; margin-top: 12px; margin-bottom: 5px; }
+.goal-progress { height: 6px; background: #EFEBE9; border-radius: 3px; margin: 10px 0 8px; overflow: hidden; position: relative; }
+.goal-progress .fill-done { position: absolute; left: 0; top: 0; bottom: 0; background: #A5D6A7; transition: width 0.5s ease; }
+.goal-progress .fill-harvest { position: absolute; left: 0; top: 0; bottom: 0; background: var(--success-color); transition: width 0.5s ease; }
+
+.counters-container { display: flex; gap: 10px; margin-bottom: 5px; }
 .counter-badge {
     display: inline-flex; align-items: center; gap: 5px;
     background: #EFEBE9; padding: 5px 10px; border-radius: 20px;

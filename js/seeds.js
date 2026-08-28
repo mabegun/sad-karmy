@@ -10,7 +10,7 @@ export function saveSeed() {
     const action = document.getElementById('input-action').value;
     var bad1s = markInvalid('input-person'), bad2s = markInvalid('input-action'); if (!person || !action) return;
     const seeds = DB.getSeeds();
-    seeds.push({ id: Date.now(), goalId: goalId, goalText: goalObj.desire, person: person, action: action, isActionDone: false, isGoalAchieved: false });
+    seeds.push({ id: Date.now(), goalId: goalId, goalText: goalObj.desire, person: person, action: action, isActionDone: false, isGoalAchieved: false, createdAt: Date.now() });
     DB.saveSeeds(seeds);
     closeModal();
     triggerRender();
@@ -53,13 +53,13 @@ export function saveEditedSeed(id) {
 }
 
 export function completeSeedAction(id) {
-    let seeds = DB.getSeeds().map(s => s.id === id ? { ...s, isActionDone: true } : s);
+    let seeds = DB.getSeeds().map(s => s.id === id ? { ...s, isActionDone: true, doneAt: Date.now() } : s);
     DB.saveSeeds(seeds);
     triggerRender();
 }
 
 export function undoSeedAction(id) {
-    let seeds = DB.getSeeds().map(s => s.id === id ? { ...s, isActionDone: false } : s);
+    let seeds = DB.getSeeds().map(s => s.id === id ? { ...s, isActionDone: false, doneAt: undefined } : s);
     DB.saveSeeds(seeds);
     triggerRender();
 }

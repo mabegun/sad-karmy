@@ -1,5 +1,5 @@
 import { DB } from './db.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, fmtDate } from './utils.js';
 import { openModal, closeModal } from './modals.js';
 import { renderSettings } from './settings.js';
 import { deleteGoalNow } from './goals.js';
@@ -42,7 +42,7 @@ export function showSeedsList(goalId, type) {
     if (list.length === 0) {
         body.innerHTML = '<p style="text-align:center; color:#8D6E63">Список пуст</p>';
     } else {
-        body.innerHTML = list.map(s => `<div class="seed-list-item ${type === 'done' ? 'done-item' : ''}"><div><b>Для кого:</b> ${escapeHtml(s.person)}</div><div><b>Действие:</b> ${escapeHtml(s.action)}</div></div>`).join('');
+        body.innerHTML = list.map(s => `<div class="seed-list-item ${type === 'done' ? 'done-item' : ''}"><div><b>Для кого:</b> ${escapeHtml(s.person)}</div><div><b>Действие:</b> ${escapeHtml(s.action)}</div>${s.createdAt ? `<div style="font-size:11px;color:var(--accent-dark);margin-top:4px;">посеяно ${fmtDate(s.createdAt)}</div>` : ''}</div>`).join('');
     }
     openModal();
 }
@@ -54,10 +54,13 @@ function renderGoals() {
     if (goals.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDDFA</div><div class="empty-title">Посади первую цель</div><p class="empty-desc">Нажми «+» и опиши, чего хочешь достичь. Сад начинается с одного семени.</p></div>'; return; }
     container.innerHTML = goals.map((g, idx) => {
         const relatedSeeds = allSeeds.filter(s => s.goalId === g.id);
-        const plannedCount = relatedSeeds.filter(s => !s.isActionDone).length;
-        const doneCount = relatedSeeds.filter(s => s.isActionDone && !s.isGoalAchieved).length;
-        return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div>
-            <div class="counters-container"><div class="counter-badge ${plannedCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${plannedCount}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div></div>
+        const sown = relatedSeeds.length;
+        const doneCount = relatedSeeds.filter(s => s.isActionDone).length;
+        const harvested = relatedSeeds.filter(s => s.isGoalAchieved).length;
+        const pctDone = sown ? Math.round(doneCount / sown * 100) : 0;
+        const pctHarv = sown ? Math.round(harvested / sown * 100) : 0;
+        const dateMeta = g.createdAt ? `<div class="card-meta">посажена ${fmtDate(g.createdAt)}</div>` : '';
+        return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div><div class="goal-progress"><div class="fill-done" style="width: ${pctDone}%"></div><div class="fill-harvest" style="width: ${pctHarv}%"></div></div><div class="counters-container"><div class="counter-badge ${sown === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${sown}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div>${harvested > 0 ? `<div class="counter-badge done" style="color:var(--success-color);border-color:var(--success-color);">\uD83C\uDF3E ${harvested}</div>` : ''}</div>${dateMeta}
             <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditGoalModal(${g.id})">✎</button><button class="btn btn-success" onclick="window._app.achieveGoal(${g.id})">✓</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('goal', ${g.id}, this)">Удалить</button></div></div></div>`;
     }).join('');
 }
@@ -66,16 +69,22 @@ function renderPlanting() {
     const container = document.getElementById('tab-planting');
     const seeds = DB.getSeeds().filter(s => !s.isActionDone);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF31</div><div class="empty-title">Пора сеять семена</div><p class="empty-desc">Чтобы получить желаемое — сначала отдай это другому. Нажми «+» и спланируй добрый поступок.</p></div>'; return; }
-    container.innerHTML = seeds.map((s, idx) => `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditSeedModal(${s.id})">✎</button><button class="btn btn-success" onclick="window._app.completeSeedAction(${s.id})">✓ Сделано</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    container.innerHTML = seeds.map((s, idx) => {
+        const dateMeta = s.createdAt ? ` · посеяно ${fmtDate(s.createdAt)}` : '';
+        return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}${dateMeta}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
+        <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditSeedModal(${s.id})">✎</button><button class="btn btn-success" onclick="window._app.completeSeedAction(${s.id})">✓ Сделано</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`;
+    }).join('');
 }
 
 function renderDone() {
     const container = document.getElementById('tab-done');
     const seeds = DB.getSeeds().filter(s => s.isActionDone && !s.isGoalAchieved);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDE4F</div><div class="empty-title">Копилка добрых дел пуста</div><p class="empty-desc">Отмечай сделанные поступки в «Плане» — и не забывай радоваться им в медитации.</p></div>'; return; }
-    container.innerHTML = seeds.map((s, idx) => `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoSeedAction(${s.id})">↩ Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    container.innerHTML = seeds.map((s, idx) => {
+        const dateMeta = s.doneAt ? ` · сделано ${fmtDate(s.doneAt)}` : '';
+        return `<div class="card" style="border-left-color: var(--success-color); animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}${dateMeta}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
+        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoSeedAction(${s.id})">↩ Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`;
+    }).join('');
 }
 
 function renderHarvest() {
