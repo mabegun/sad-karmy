@@ -1,5 +1,5 @@
 // === ВЕРСИЯ ПРИЛОЖЕНИЯ (менять только здесь!) ===
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.2.1';
 const CACHE_NAME = `saddharma-app-v${APP_VERSION}`;
 
 const ASSETS = [
@@ -62,10 +62,28 @@ self.addEventListener('fetch', (event) => {
   if (!event.request.url.startsWith(self.location.origin)) return;
   if (event.request.method !== 'GET') return;
   
-  event.respondWith(
-    caches.match(event.request)
-      .then((cached) => cached || fetch(event.request))
-  );
+  const url = new URL(event.request.url);
+  const isHtml = url.pathname === '/' || url.pathname.endsWith('.html') || url.pathname.endsWith('.json');
+  
+  if (isHtml) {
+    // HTML и version.json — network-first (всегда свежие)
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Успешно получили с сети — кэшируем и отдаём
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    // CSS, JS, SVG — cache-first (быстрая загрузка)
+    event.respondWith(
+      caches.match(event.request)
+        .then((cached) => cached || fetch(event.request))
+    );
+  }
 });
 
 // Обработка сообщений от клиента
