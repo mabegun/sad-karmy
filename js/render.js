@@ -1,6 +1,7 @@
 import { DB } from './db.js';
 import { escapeHtml, fmtDate } from './utils.js';
 import { openModal, closeModal } from './modals.js';
+import { triggerRender } from './events.js';
 import { renderSettings } from './settings.js';
 import { deleteGoalNow } from './goals.js';
 import { deleteSeedNow } from './seeds.js';
@@ -30,7 +31,7 @@ export function showSeedsList(goalId, type) {
     let list = [];
     let title = "";
     if (type === 'planned') {
-        list = seeds.filter(s => !s.isActionDone);
+        list = seeds.filter(s => !s.isActionDone && !s.isGoalAchieved);
         title = "\uD83C\uDF31 Запланированные";
     } else {
         list = seeds.filter(s => s.isActionDone && !s.isGoalAchieved);
@@ -42,9 +43,28 @@ export function showSeedsList(goalId, type) {
     if (list.length === 0) {
         body.innerHTML = '<p style="text-align:center; color:#8D6E63">Список пуст</p>';
     } else {
-        body.innerHTML = list.map(s => `<div class="seed-list-item ${type === 'done' ? 'done-item' : ''}"><div><b>Для кого:</b> ${escapeHtml(s.person)}</div><div><b>Действие:</b> ${escapeHtml(s.action)}</div>${s.createdAt ? `<div style="font-size:11px;color:var(--accent-dark);margin-top:4px;">посеяно ${fmtDate(s.createdAt)}</div>` : ''}</div>`).join('');
+        body.innerHTML = list.map(s => {
+            const dateStr = s.createdAt ? ` · посеяно ${fmtDate(s.createdAt)}` : '';
+            const doneDateStr = s.doneAt ? ` · сделано ${fmtDate(s.doneAt)}` : '';
+            const actionBtn = type === 'planned'
+                ? `<button class="btn btn-success" style="flex:0 0 auto;" onclick="window._app.seedListAction('done', ${s.id}, ${goalId}, 'planned')">✓ Сделано</button>`
+                : `<button class="btn btn-primary" style="flex:0 0 auto;" onclick="window._app.seedListAction('undo', ${s.id}, ${goalId}, 'done')">↩ В план</button>`;
+            return `<div class="seed-list-item ${type === 'done' ? 'done-item' : ''}"><div><b>Для кого:</b> ${escapeHtml(s.person)}</div><div><b>Действие:</b> ${escapeHtml(s.action)}</div><div style="font-size:11px;color:var(--accent-dark);margin-top:4px;">${dateStr || doneDateStr}</div><div style="margin-top:8px;display:flex;gap:8px;">${actionBtn}</div></div>`;
+        }).join('');
     }
     openModal();
+}
+
+export function seedListAction(action, seedId, goalId, listType) {
+    if (action === 'done') {
+        const seeds = DB.getSeeds().map(s => s.id === seedId ? { ...s, isActionDone: true, doneAt: Date.now() } : s);
+        DB.saveSeeds(seeds);
+    } else {
+        const seeds = DB.getSeeds().map(s => s.id === seedId ? { ...s, isActionDone: false, doneAt: undefined } : s);
+        DB.saveSeeds(seeds);
+    }
+    showSeedsList(goalId, listType);
+    triggerRender();
 }
 
 function renderGoals() {

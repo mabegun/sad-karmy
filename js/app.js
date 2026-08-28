@@ -1,5 +1,5 @@
 import { onRender } from './events.js';
-import { render, handleDeleteClick, showSeedsList } from './render.js';
+import { render, handleDeleteClick, showSeedsList, seedListAction } from './render.js';
 import { saveGoal, openEditGoalModal, saveEditedGoal, achieveGoal, undoHarvest, openNewGoalModal, closeAndOpenInstruction } from './goals.js';
 import { saveSeed, openEditSeedModal, saveEditedSeed, completeSeedAction, undoSeedAction, openNewSeedModal } from './seeds.js';
 import { openMeditation } from './meditation.js';
@@ -35,6 +35,7 @@ window._app = {
     openModalOrAction,
     handleDeleteClick,
     showSeedsList,
+    seedListAction,
     saveGoal,
     openEditGoalModal,
     saveEditedGoal,
