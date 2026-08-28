@@ -1,6 +1,27 @@
 import { DB } from './db.js';
+import { escapeHtml } from './utils.js';
 import { openInfoMenu, closeModal } from './modals.js';
 import { triggerRender } from './events.js';
+/** Strip HTML tags from all string fields in imported data to prevent stored XSS. */
+function sanitizeString(val) {
+    if (typeof val !== 'string') return val;
+    return val.replace(/<\/?[a-zA-Z][^>]*>/g, '');
+}
+
+function sanitizeImportedData(data) {
+    if (data.goals) data.goals = data.goals.map(g => ({
+        ...g,
+        problem: sanitizeString(g.problem),
+        desire: sanitizeString(g.desire)
+    }));
+    if (data.seeds) data.seeds = data.seeds.map(s => ({
+        ...s,
+        person: sanitizeString(s.person),
+        action: sanitizeString(s.action),
+        goalText: sanitizeString(s.goalText)
+    }));
+    return data;
+}
 
 export function renderSettings() {
     const container = document.getElementById('tab-settings');
@@ -40,6 +61,7 @@ export function handleFileImport(event) {
             const data = JSON.parse(e.target.result);
             if (data.goals && data.seeds) {
                 if (confirm('Загрузить данные?')) {
+                    sanitizeImportedData(data);
                     DB.saveGoals(data.goals);
                     DB.saveSeeds(data.seeds);
                     if (data.config) DB.saveConfig(data.config);

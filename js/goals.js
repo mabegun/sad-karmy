@@ -1,5 +1,5 @@
 import { DB } from './db.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, escapeAttr } from './utils.js';
 import { openModal, closeModal, openInstruction } from './modals.js';
 import { triggerRender } from './events.js';
 
@@ -24,9 +24,9 @@ export function openEditGoalModal(id) {
             Уточни, что тебя не устраивает и чего ты хочешь достичь.
         </div>
         <label>Что не устраивает в жизни и хочется исправить?</label>
-        <input type="text" id="input-fix" value="${escapeHtml(goal.problem)}">
+        <input type="text" id="input-fix" value="${escapeAttr(goal.problem)}">
         <label>Что хочешь получить взамен?</label>
-        <input type="text" id="input-want" value="${escapeHtml(goal.desire)}">
+        <input type="text" id="input-want" value="${escapeAttr(goal.desire)}">
         <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="window._app.saveEditedGoal(${id})">Сохранить изменения</button>
         <a href="#" onclick="window._app.closeAndOpenInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">\uD83D\uDCD6 Открыть полную инструкцию</a>
     `;

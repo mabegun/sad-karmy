@@ -1,5 +1,5 @@
 import { DB } from './db.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, escapeAttr } from './utils.js';
 import { openModal, closeModal, openInstruction } from './modals.js';
 import { triggerRender } from './events.js';
 
@@ -30,9 +30,9 @@ export function openEditSeedModal(id) {
         <label>Для какой цели сеем?</label>
         <select id="input-goal-id">${options}</select>
         <label>Для кого делаем доброе дело?</label>
-        <input type="text" id="input-person" value="${escapeHtml(seed.person)}">
+        <input type="text" id="input-person" value="${escapeAttr(seed.person)}">
         <label>Какой поступок планируешь?</label>
-        <input type="text" id="input-action" value="${escapeHtml(seed.action)}">
+        <input type="text" id="input-action" value="${escapeAttr(seed.action)}">
         <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="window._app.saveEditedSeed(${id})">Сохранить изменения</button>
         <a href="#" onclick="window._app.closeAndOpenInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">\uD83D\uDCD6 Открыть полную инструкцию</a>
     `;

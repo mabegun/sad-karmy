@@ -1,6 +1,6 @@
 {
-  "version": "2.2.1",
+  "version": "2.2.2",
   "name": "Сад Кармы",
   "buildDate": "2026-08-29",
-  "changelog": "feat: отмена урожая — кнопка «Вернуть»"
+  "changelog": "fix: XSS-защита — escapeAttr для атрибутов, санитизация импорта"
 }
