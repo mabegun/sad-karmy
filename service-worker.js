@@ -3,11 +3,11 @@ const APP_VERSION = '1.4.0';
 const CACHE_NAME = `saddharma-app-v${APP_VERSION}`;
 
 const ASSETS = [
-  '/sad-karmy/',
-  '/sad-karmy/index.html',
-  '/sad-karmy/manifest.json',
-  '/sad-karmy/icon.svg',
-  '/sad-karmy/version.json'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon.svg',
+  '/version.json'
 ];
 
 // Установка
