@@ -87,8 +87,8 @@ export async function checkForUpdates() {
         
         if (swRegistration) {
             await swRegistration.update();
-            // Даём время новому SW перейти в состояние waiting
-            await new Promise(r => setTimeout(r, 500));
+            // Ждём пока новый SW установится и перейдёт в waiting
+            await new Promise(r => setTimeout(r, 2000));
         }
         
         // Проверяем: есть ли waiting SW или отличается ли версия на сервере
@@ -107,14 +107,34 @@ export async function checkForUpdates() {
     checkBtn.disabled = false;
 }
 
-export function updateApp() {
+export async function updateApp() {
     const worker = getWaitingWorker();
     if (worker) {
         worker.postMessage('skipWaiting');
-    } else {
-        // Fallback: принудительная перезагрузка
-        window.location.reload();
+        // Ждём активации нового SW (controllerchange → reload)
+        return;
     }
+    // Fallback: если waiting worker не найден — принудительно обновляем
+    console.log('⏳ Принудительное обновление...');
+    try {
+        if (swRegistration) {
+            await swRegistration.update();
+            await new Promise(r => setTimeout(r, 1000));
+        }
+        const w = getWaitingWorker();
+        if (w) {
+            w.postMessage('skipWaiting');
+            return;
+        }
+    } catch (e) { /* ignore */ }
+    // Последний resort: unregister SW, чистим кэш, перезагрузка
+    try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const reg of regs) await reg.unregister();
+        const keys = await caches.keys();
+        for (const k of keys) await caches.delete(k);
+    } catch (e) { /* ignore */ }
+    window.location.reload();
 }
 
 export function confirmUpdate() {
