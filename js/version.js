@@ -2,27 +2,31 @@ let currentVersion = '...';
 let serverVersion = null;
 let swRegistration = null;
 let updateAvailable = false;
+let notificationDismissed = false;
 
 import { openInfoMenu, closeInfoMenu } from './modals.js';
 
+const VERSION_STORAGE_KEY = 'sw_version';
+
 async function getVersionFromSW() {
-    return new Promise((resolve) => {
-        const controller = navigator.serviceWorker.controller;
-        if (!controller) {
-            resolve(null);
-            return;
+    const controller = navigator.serviceWorker.controller;
+    if (!controller) {
+        return sessionStorage.getItem(VERSION_STORAGE_KEY) || null;
+    }
+    try {
+        const version = await new Promise((resolve) => {
+            const mc = new MessageChannel();
+            mc.port1.onmessage = (e) => resolve(e.data.version);
+            controller.postMessage('GET_VERSION', [mc.port2]);
+            setTimeout(() => resolve(null), 3000);
+        });
+        if (version) {
+            sessionStorage.setItem(VERSION_STORAGE_KEY, version);
+            return version;
         }
-        try {
-            const messageChannel = new MessageChannel();
-            messageChannel.port1.onmessage = (event) => {
-                resolve(event.data.version);
-            };
-            controller.postMessage('GET_VERSION', [messageChannel.port2]);
-            setTimeout(() => resolve(null), 2000);
-        } catch (e) {
-            resolve(null);
-        }
-    });
+    } catch (e) { /* ignore */ }
+    // Fallback: версия из sessionStorage (от предыдущей успешной проверки)
+    return sessionStorage.getItem(VERSION_STORAGE_KEY) || null;
 }
 
 async function getServerVersion() {
@@ -39,6 +43,7 @@ async function getServerVersion() {
 }
 
 function showUpdateNotification() {
+    if (notificationDismissed) return;
     updateAvailable = true;
     const el = document.getElementById('update-notification');
     if (el) el.style.display = 'block';
@@ -91,7 +96,11 @@ export async function checkForUpdates() {
         }
         
         const hasWaiting = !!getWaitingWorker();
-        if (hasWaiting || (serverVersion && serverVersion !== currentVersion)) {
+        if (hasWaiting) {
+            notificationDismissed = false;
+            showUpdateNotification();
+        } else if (serverVersion && currentVersion !== '?.?.?' && serverVersion !== currentVersion) {
+            notificationDismissed = false;
             showUpdateNotification();
         } else {
             updateAvailable = false;
@@ -114,7 +123,7 @@ export function updateApp() {
         return;
     }
     // Жёсткий вариант: чистим всё и перезагружаем
-    console.log('⏳ Принудительное обновление...');
+    console.log('\u23F3 Принудительное обновление...');
     navigator.serviceWorker.getRegistrations().then(regs => {
         return Promise.all(regs.map(r => r.unregister()));
     }).then(() => {
@@ -133,8 +142,11 @@ export function confirmUpdate() {
 }
 
 export function hideUpdateNotification() {
+    notificationDismissed = true;
+    updateAvailable = false;
     const el = document.getElementById('update-notification');
     if (el) el.style.display = 'none';
+    updateVersionDisplay();
 }
 
 export function initVersionSystem() {
@@ -156,6 +168,7 @@ export function initVersionSystem() {
     navigator.serviceWorker.addEventListener('message', function (event) {
         if (event.data && event.data.type === 'VERSION') {
             currentVersion = event.data.version;
+            sessionStorage.setItem(VERSION_STORAGE_KEY, currentVersion);
             updateVersionDisplay();
         }
     });
@@ -184,12 +197,11 @@ export function initVersionSystem() {
                 showUpdateNotification();
             }
             
-            // Получаем текущую версию
+            // Получаем текущую версию (с fallback в sessionStorage)
             currentVersion = await getVersionFromSW() || '?.?.?';
             updateVersionDisplay();
             
             // Автопроверка: триггерим обновление SW если версия на сервере новее
-            // Уведомление покажет updatefound handler, а не этот код
             try {
                 const server = await getServerVersion();
                 if (server && currentVersion !== '?.?.?' && server !== currentVersion) {
