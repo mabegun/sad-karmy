@@ -592,7 +592,7 @@
 
     async function getServerVersion() {
         try {
-            const response = await fetch('/sad-karmy/version.json?t=' + Date.now());
+            const response = await fetch('/version.json?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
                 return data.version;
@@ -784,7 +784,7 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', async function() {
             try {
-                swRegistration = await navigator.serviceWorker.register('/sad-karmy/service-worker.js');
+                swRegistration = await navigator.serviceWorker.register('/service-worker.js');
                 console.log('✅ SW зарегистрирован:', swRegistration.scope);
                 
                 currentVersion = await getVersionFromSW() || '?.?.?';
