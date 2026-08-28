@@ -87,11 +87,9 @@ export async function checkForUpdates() {
         
         if (swRegistration) {
             await swRegistration.update();
-            // Ждём пока новый SW установится и перейдёт в waiting
             await new Promise(r => setTimeout(r, 2000));
         }
         
-        // Проверяем: есть ли waiting SW или отличается ли версия на сервере
         const hasWaiting = !!getWaitingWorker();
         if (hasWaiting || (serverVersion && serverVersion !== currentVersion)) {
             showUpdateNotification();
@@ -107,34 +105,25 @@ export async function checkForUpdates() {
     checkBtn.disabled = false;
 }
 
-export async function updateApp() {
+export function updateApp() {
+    // Пытаемся мягко: skipWaiting
     const worker = getWaitingWorker();
     if (worker) {
         worker.postMessage('skipWaiting');
-        // Ждём активации нового SW (controllerchange → reload)
+        // controllerchange → reload произойдёт автоматически
         return;
     }
-    // Fallback: если waiting worker не найден — принудительно обновляем
+    // Жёсткий вариант: чистим всё и перезагружаем
     console.log('⏳ Принудительное обновление...');
-    try {
-        if (swRegistration) {
-            await swRegistration.update();
-            await new Promise(r => setTimeout(r, 1000));
-        }
-        const w = getWaitingWorker();
-        if (w) {
-            w.postMessage('skipWaiting');
-            return;
-        }
-    } catch (e) { /* ignore */ }
-    // Последний resort: unregister SW, чистим кэш, перезагрузка
-    try {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        for (const reg of regs) await reg.unregister();
-        const keys = await caches.keys();
-        for (const k of keys) await caches.delete(k);
-    } catch (e) { /* ignore */ }
-    window.location.replace(window.location.pathname + '?v=' + Date.now());
+    navigator.serviceWorker.getRegistrations().then(regs => {
+        return Promise.all(regs.map(r => r.unregister()));
+    }).then(() => {
+        return caches.keys().then(keys => {
+            return Promise.all(keys.map(k => caches.delete(k)));
+        });
+    }).then(() => {
+        window.location.replace(window.location.pathname + '?v=' + Date.now());
+    });
 }
 
 export function confirmUpdate() {
@@ -176,7 +165,7 @@ export function initVersionSystem() {
             swRegistration = await navigator.serviceWorker.register('./service-worker.js');
             console.log('\u2705 SW зарегистрирован:', swRegistration.scope);
             
-            // Слушаем обновления ДО любых await, чтобы не пропустить событие
+            // Слушаем обновления ДО любых await
             swRegistration.addEventListener('updatefound', function () {
                 const newWorker = swRegistration.installing;
                 if (!newWorker) return;
@@ -185,14 +174,6 @@ export function initVersionSystem() {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         console.log('\u2B06\uFE0F Новый SW установлен, ждём применения');
                         showUpdateNotification();
-                    }
-                    if (newWorker.state === 'activated') {
-                        // Новый SW активировался — обновляем версию
-                        currentVersion = newWorker.scriptURL ? '...' : currentVersion;
-                        getVersionFromSW().then(v => {
-                            if (v) currentVersion = v;
-                            updateVersionDisplay();
-                        });
                     }
                 });
             });
