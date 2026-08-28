@@ -1,5 +1,5 @@
 // === ВЕРСИЯ ПРИЛОЖЕНИЯ (менять только здесь!) ===
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.3.1';
 const CACHE_NAME = `saddharma-app-v${APP_VERSION}`;
 
 const ASSETS = [
@@ -66,9 +66,9 @@ self.addEventListener('fetch', (event) => {
   const isHtml = url.pathname === '/' || url.pathname.endsWith('.html') || url.pathname.endsWith('.json');
   
   if (isHtml) {
-    // HTML и version.json — network-first (всегда свежие)
+    // HTML и version.json — network-first (всегда свежие, без HTTP-кэша)
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-store' })
         .then((response) => {
           // Успешно получили с сети — кэшируем и отдаём
           const clone = response.clone();

@@ -188,6 +188,21 @@ export function initVersionSystem() {
             currentVersion = await getVersionFromSW() || '?.?.?';
             updateVersionDisplay();
             
+            // Автопроверка: сравниваем версию SW с версией на сервере
+            try {
+                const server = await getServerVersion();
+                if (server && server !== currentVersion) {
+                    console.log('\u2B06\uFE0F Версия на сервере (' + server + ') отличается от SW (' + currentVersion + ')');
+                    await swRegistration.update();
+                    await new Promise(r => setTimeout(r, 1500));
+                    if (!getWaitingWorker() && server !== currentVersion) {
+                        showUpdateNotification();
+                    }
+                }
+            } catch (e) {
+                console.log('Автопроверка версии не удалась:', e);
+            }
+            
         } catch (error) {
             console.log('\u274C Ошибка SW:', error);
             currentVersion = '?.?.?';
