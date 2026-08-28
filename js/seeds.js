@@ -1,5 +1,5 @@
 import { DB } from './db.js';
-import { escapeHtml, escapeAttr } from './utils.js';
+import { escapeHtml, escapeAttr, markInvalid } from './utils.js';
 import { openModal, closeModal, openInstruction } from './modals.js';
 import { triggerRender } from './events.js';
 
@@ -8,7 +8,7 @@ export function saveSeed() {
     const goalObj = DB.getGoals().find(g => g.id === goalId);
     const person = document.getElementById('input-person').value;
     const action = document.getElementById('input-action').value;
-    if (!person || !action) return alert('Заполни поля');
+    var bad1s = markInvalid('input-person'), bad2s = markInvalid('input-action'); if (!person || !action) return;
     const seeds = DB.getSeeds();
     seeds.push({ id: Date.now(), goalId: goalId, goalText: goalObj.desire, person: person, action: action, isActionDone: false, isGoalAchieved: false });
     DB.saveSeeds(seeds);
@@ -45,7 +45,7 @@ export function saveEditedSeed(id) {
     const newGoalObj = DB.getGoals().find(g => g.id === newGoalId);
     const newPerson = document.getElementById('input-person').value;
     const newAction = document.getElementById('input-action').value;
-    if (!newPerson || !newAction) return alert('Заполни поля');
+    var bad1se = markInvalid('input-person'), bad2se = markInvalid('input-action'); if (!newPerson || !newAction) return;
     let seeds = DB.getSeeds().map(s => s.id === id ? { ...s, goalId: newGoalId, goalText: newGoalObj.desire, person: newPerson, action: newAction } : s);
     DB.saveSeeds(seeds);
     closeModal();

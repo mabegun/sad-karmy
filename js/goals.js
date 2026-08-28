@@ -1,12 +1,12 @@
 import { DB } from './db.js';
-import { escapeHtml, escapeAttr } from './utils.js';
+import { escapeHtml, escapeAttr, markInvalid } from './utils.js';
 import { openModal, closeModal, openInstruction } from './modals.js';
 import { triggerRender } from './events.js';
 
 export function saveGoal() {
     const fix = document.getElementById('input-fix').value;
     const want = document.getElementById('input-want').value;
-    if (!fix || !want) return alert('Заполни поля');
+    var bad1 = markInvalid('input-fix'), bad2 = markInvalid('input-want'); if (!fix || !want) return;
     const goals = DB.getGoals();
     goals.push({ id: Date.now(), problem: fix, desire: want, completed: false });
     DB.saveGoals(goals);
@@ -38,7 +38,7 @@ export function saveEditedGoal(id) {
     let goals = DB.getGoals();
     const newFix = document.getElementById('input-fix').value;
     const newWant = document.getElementById('input-want').value;
-    if (!newFix || !newWant) return alert('Заполни поля');
+    var bad1e = markInvalid('input-fix'), bad2e = markInvalid('input-want'); if (!newFix || !newWant) return;
     goals = goals.map(g => g.id === id ? { ...g, problem: newFix, desire: newWant } : g);
     let seeds = DB.getSeeds().map(s => s.goalId === id ? { ...s, goalText: newWant } : s);
     DB.saveGoals(goals);

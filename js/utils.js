@@ -19,3 +19,15 @@ export function escapeAttr(text) {
         .replace(/\n/g, '&#10;')
         .replace(/\r/g, '&#13;')
 }
+
+export function markInvalid(id) {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    if (!el.value.trim()) {
+        el.classList.add('invalid');
+        setTimeout(() => el.classList.remove('invalid'), 600);
+        el.focus();
+        return true;
+    }
+    return false;
+}
