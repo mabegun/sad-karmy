@@ -67,7 +67,7 @@ function renderGoals() {
 
 function renderPlanting() {
     const container = document.getElementById('tab-planting');
-    const seeds = DB.getSeeds().filter(s => !s.isActionDone);
+    const seeds = DB.getSeeds().filter(s => !s.isActionDone && !s.isGoalAchieved);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF31</div><div class="empty-title">Пора сеять семена</div><p class="empty-desc">Чтобы получить желаемое — сначала отдай это другому. Нажми «+» и спланируй добрый поступок.</p></div>'; return; }
     container.innerHTML = seeds.map((s, idx) => {
         const dateMeta = s.createdAt ? ` · посеяно ${fmtDate(s.createdAt)}` : '';
