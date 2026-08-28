@@ -40,7 +40,7 @@
 <!-- Вкладки -->
 <div class="tabs-container">
     <div class="tab active" onclick="window._app.switchTab('goals', this)">🏔 Цели</div>
-    <div class="tab" onclick="window._app.switchTab('planting', this)">🌱 Посев</div>
+    <div class="tab" onclick="window._app.switchTab('planting', this)">🌱 План</div>
     <div class="tab" onclick="window._app.switchTab('done', this)">🙏 Сделано</div>
     <div class="tab" onclick="window._app.switchTab('harvest', this)">🌾 Урожай</div>
     <div class="tab" onclick="window._app.switchTab('settings', this)">⚙️</div>
@@ -56,7 +56,7 @@
 </div>
 
 <!-- Кнопки -->
-<button class="meditation-btn" onclick="window._app.openMeditation()">☕ Кофе-медитация</button>
+<button class="meditation-btn" onclick="window._app.openMeditation()">☕ Медитация</button>
 <button class="fab" onclick="window._app.openModalOrAction()">+</button>
 
 <!-- Модальные окна -->
@@ -150,7 +150,7 @@
                     <li><i>Например: если ты хочешь больше клиентов, найди коллегу, который ищет стажёра, или помоги другу раскрутить его маленький бизнес.</i></li>
                     <li>Придумай и запланируй, как именно ты поможешь этим людям в достижении их цели. Ты становишься <b>проводником</b>, тем человеком, через которого их мечта становится ближе.</li>
                     <li>Это может касаться не только цели, но и похожей проблемы. Если у тебя проблемы со здоровьем — помоги пожилой соседке донести сумки или своди племянника к врачу.</li>
-                    <li>Зайди в раздел <b>«Посев» 📝</b>.</li>
+                    <li>Зайди в раздел <b>«План» 📝</b>.</li>
                     <li>Впиши, для кого ты решил сделать добрый поступок, и подробно опиши, что именно запланировал.</li>
                 </ul>
             </div>
@@ -158,16 +158,16 @@
                 <h3>Шаг 3. Делаем! ✅</h3>
                 <p>Когда ты выполнил запланированное, не забывай зафиксировать результат.</p>
                 <ul>
-                    <li>Найди запись в разделе «Посев».</li>
+                    <li>Найди запись в разделе «План».</li>
                     <li>Нажми кнопку <b>«Сделано»</b>.</li>
                     <li>Запись автоматически переместится в раздел <b>«Сделано» 📂</b>. Это твоя копилка добрых дел.</li>
                 </ul>
             </div>
             <div class="instruction-step">
-                <h3>Шаг 4. Самый важный шаг: Радуемся! (Кофе-медитация) ☕✨</h3>
+                <h3>Шаг 4. Самый важный шаг: Радуемся! (Медитация) ☕✨</h3>
                 <p>Этот шаг позволяет твоим посеянным семенам прорасти быстрее и стать в тысячу раз сильнее.</p>
                 <ul>
-                    <li>Каждый вечер перед сном (а лучше и несколько раз в день) заходи в раздел <b>«Кофе-медитация» 🧘‍♂️</b>.</li>
+                    <li>Каждый вечер перед сном (а лучше и несколько раз в день) заходи в раздел <b>«Медитация» 🧘‍♂️</b>.</li>
                     <li>Перечитывай, какие семена ты посеял (смотри раздел «Сделано»).</li>
                     <li><b>Порадуйся</b> тому, какой ты молодец! Ты сажаешь такие хорошие, добрые семена.</li>
                     <li><b>Искренне порадуйся за людей</b>, которые получили от тебя помощь. Представь, как им стало хорошо, легко и радостно.</li>
@@ -267,10 +267,10 @@
     </div>
 </div>
 
-<!-- 6. Кофе-медитация -->
+<!-- 6. Медитация -->
 <div id="meditation-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>☕ Кофе-медитация</h3><button class="close-btn" onclick="window._app.closeMeditationModal()">&times;</button></div>
+        <div class="modal-header"><h3>☕ Медитация</h3><button class="close-btn" onclick="window._app.closeMeditationModal()">&times;</button></div>
         <div class="modal-body"><p style="font-style: italic; color: #5D4037;">Радуйся добрым делам...</p><div id="meditation-list"></div></div>
     </div>
 </div>

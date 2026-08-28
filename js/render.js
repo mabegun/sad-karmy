@@ -57,7 +57,7 @@ function renderGoals() {
         const plannedCount = relatedSeeds.filter(s => !s.isActionDone).length;
         const doneCount = relatedSeeds.filter(s => s.isActionDone && !s.isGoalAchieved).length;
         return `<div class="card"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div>
-            <div class="counters-container"><div class="counter-badge ${plannedCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 Посев: ${plannedCount}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div></div>
+            <div class="counters-container"><div class="counter-badge ${plannedCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${plannedCount}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div></div>
             <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditGoalModal(${g.id})">✎</button><button class="btn btn-success" onclick="window._app.achieveGoal(${g.id})">✓</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('goal', ${g.id}, this)">Удалить</button></div></div></div>`;
     }).join('');
 }
