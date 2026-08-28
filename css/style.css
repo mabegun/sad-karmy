@@ -160,6 +160,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 .btn-action.import { background: transparent; color: var(--text-ink); border: 1px solid #D7CCC8; }
 .btn-action.secondary { background: transparent; color: var(--text-light); border: 1px solid #D7CCC8; }
 .btn-action.update { background: linear-gradient(to right, var(--success-color), #1B5E20); border-color: var(--success-color); color: white; }
+.btn-action.danger { background: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); }
+.btn-action.danger:hover { background: var(--danger-color); color: white; }
 
 .version-box { background: rgba(255,255,255,0.7); border: 1px solid #D7CCC8; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center; }
 .version-number { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--primary-color); }

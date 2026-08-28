@@ -3,7 +3,7 @@ import { render, handleDeleteClick, showSeedsList, seedListAction } from './rend
 import { saveGoal, openEditGoalModal, saveEditedGoal, achieveGoal, undoHarvest, openNewGoalModal, closeAndOpenInstruction } from './goals.js';
 import { saveSeed, openEditSeedModal, saveEditedSeed, completeSeedAction, undoSeedAction, openNewSeedModal } from './seeds.js';
 import { openMeditation } from './meditation.js';
-import { exportData, handleFileImport, toggleNotification, updateTime } from './settings.js';
+import { exportData, handleFileImport, toggleNotification, updateTime, confirmWipeAll, wipeAll, openAbout } from './settings.js';
 import { openInfoMenu, closeInfoMenu, closeModal, openInstruction, closeInstruction, openPrivacy, closePrivacy, openInstall, closeInstall, closeMeditationModal } from './modals.js';
 import { initVersionSystem, checkForUpdates, updateApp, confirmUpdate, hideUpdateNotification, updateVersionDisplay } from './version.js';
 
@@ -62,6 +62,9 @@ window._app = {
     closeMeditationModal,
     closeModal,
     closeAndOpenInstruction,
+    confirmWipeAll,
+    wipeAll,
+    openAbout,
     checkForUpdates,
     updateApp,
     confirmUpdate,
