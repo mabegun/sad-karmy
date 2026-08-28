@@ -1,6 +1,6 @@
 import { onRender } from './events.js';
 import { render, handleDeleteClick, showSeedsList } from './render.js';
-import { saveGoal, openEditGoalModal, saveEditedGoal, achieveGoal, openNewGoalModal, closeAndOpenInstruction } from './goals.js';
+import { saveGoal, openEditGoalModal, saveEditedGoal, achieveGoal, undoHarvest, openNewGoalModal, closeAndOpenInstruction } from './goals.js';
 import { saveSeed, openEditSeedModal, saveEditedSeed, completeSeedAction, undoSeedAction, openNewSeedModal } from './seeds.js';
 import { openMeditation } from './meditation.js';
 import { exportData, handleFileImport, toggleNotification, updateTime } from './settings.js';
@@ -39,6 +39,7 @@ window._app = {
     openEditGoalModal,
     saveEditedGoal,
     achieveGoal,
+    undoHarvest,
     saveSeed,
     openEditSeedModal,
     saveEditedSeed,

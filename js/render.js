@@ -67,7 +67,7 @@ function renderPlanting() {
     const seeds = DB.getSeeds().filter(s => !s.isActionDone);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF31</div>Время посадки</div>'; return; }
     container.innerHTML = seeds.map(s => `<div class="card"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditSeedModal(${s.id})">✎</button><button class="btn btn-success" onclick="window._app.completeSeedAction(${s.id})">✓ Сделано</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+        <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditSeedModal(${s.id})">✎</button><button class="btn btn-success" onclick="window._app.completeSeedAction(${s.id})">✓ Сделано</button><button class="btn btn-primary" onclick="window._app.undoHarvest(${s.goalId})">← Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
 }
 
 function renderDone() {
@@ -75,7 +75,7 @@ function renderDone() {
     const seeds = DB.getSeeds().filter(s => s.isActionDone && !s.isGoalAchieved);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDE4F</div>Список пуст</div>'; return; }
     container.innerHTML = seeds.map(s => `<div class="card"><div class="card-body"><div class="card-meta">\uD83C\uDFAF ${escapeHtml(s.goalText)}</div><div class="card-title">Для: ${escapeHtml(s.person)}</div><div class="card-text">${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoSeedAction(${s.id})">↩ Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoSeedAction(${s.id})">↩ Вернуть</button><button class="btn btn-primary" onclick="window._app.undoHarvest(${s.goalId})">← Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
 }
 
 function renderHarvest() {
@@ -83,7 +83,7 @@ function renderHarvest() {
     const seeds = DB.getSeeds().filter(s => s.isGoalAchieved);
     if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF3E</div>Урожай созреет скоро</div>'; return; }
     container.innerHTML = seeds.map(s => `<div class="card" style="border-left-color: var(--success-color);"><div class="card-body"><div class="card-title" style="color: var(--success-color);">Урожай: ${escapeHtml(s.goalText)}</div><div class="card-text">Для <b>${escapeHtml(s.person)}</b>: ${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoHarvest(${s.goalId})">← Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
 }
 
 export function render() {

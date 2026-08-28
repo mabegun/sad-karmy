@@ -61,6 +61,19 @@ export function deleteGoalNow(id) {
     triggerRender();
 }
 
+export function undoHarvest(goalId) {
+    if (!confirm('Вернуть цель и все связанные семена обратно?\nСделанные поступки останутся сделанными.')) return;
+    let goals = DB.getGoals().map(g =>
+        g.id === goalId ? { ...g, completed: false } : g
+    );
+    let seeds = DB.getSeeds().map(s =>
+        s.goalId === goalId ? { ...s, isGoalAchieved: false } : s
+    );
+    DB.saveGoals(goals);
+    DB.saveSeeds(seeds);
+    triggerRender();
+}
+
 export function openNewGoalModal() {
     document.getElementById('modal-title').innerText = "Новая цель \uD83C\uDFAF";
     document.getElementById('modal-body').innerHTML = `
