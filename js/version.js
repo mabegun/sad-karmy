@@ -134,7 +134,7 @@ export async function updateApp() {
         const keys = await caches.keys();
         for (const k of keys) await caches.delete(k);
     } catch (e) { /* ignore */ }
-    window.location.reload();
+    window.location.replace(window.location.pathname + '?v=' + Date.now());
 }
 
 export function confirmUpdate() {
