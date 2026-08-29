@@ -152,8 +152,8 @@ export function showHarvestTimeline(goalId) {
                 else if (isDone) { dotClass += ' done'; statusLabel = 'сделано'; }
                 else { dotClass += ' planned'; statusLabel = 'в плане'; }
                 let dateParts = [];
-                if (s.createdAt) dateParts.push('посажено ' + fmtDate(s.createdAt));
-                if (s.doneAt) dateParts.push('сделано ' + fmtDate(s.doneAt));
+                if (s.createdAt) dateParts.push('запланировано ' + fmtDate(s.createdAt));
+                if (s.doneAt) dateParts.push('сделано (посажено) ' + fmtDate(s.doneAt));
                 const dateStr = dateParts.join(' → ');
                 return `<div class="timeline-item">
                     <div class="${dotClass}"></div>
