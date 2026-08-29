@@ -140,7 +140,6 @@ export function showHarvestTimeline(goalId) {
     } else {
         body.innerHTML = `
             <div style="background:rgba(255,255,255,0.6);border-left:3px solid var(--success-color);padding:10px 12px;margin-bottom:15px;font-size:13px;border-radius:4px;color:var(--text-light);">
-                Исправить: ${escapeHtml(goal.problem)}<br>
                 <b>${doneCount}</b> из <b>${total}</b> семян сделано
             </div>
             <div class="timeline">${sorted.map((s, i) => {
@@ -185,7 +184,7 @@ function renderGoals() {
         const pctDone = sown ? Math.round(doneCount / sown * 100) : 0;
         const pctHarv = sown ? Math.round(harvested / sown * 100) : 0;
         const dateMeta = g.createdAt ? `<div class="card-meta">запланирована ${fmtDate(g.createdAt)}</div>` : '';
-        return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div><div class="goal-progress"><div class="fill-done" style="width: ${pctDone}%"></div><div class="fill-harvest" style="width: ${pctHarv}%"></div></div><div class="counters-container"><div class="counter-badge ${sown === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${sown}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div>${harvested > 0 ? `<div class="counter-badge done" style="color:var(--success-color);border-color:var(--success-color);">\uD83C\uDF3E ${harvested}</div>` : ''}</div>${dateMeta}
+        return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="goal-progress"><div class="fill-done" style="width: ${pctDone}%"></div><div class="fill-harvest" style="width: ${pctHarv}%"></div></div><div class="counters-container"><div class="counter-badge ${sown === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${sown}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div>${harvested > 0 ? `<div class="counter-badge done" style="color:var(--success-color);border-color:var(--success-color);">\uD83C\uDF3E ${harvested}</div>` : ''}</div>${dateMeta}
             <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditGoalModal(${g.id})">✎</button><button class="btn btn-success" onclick="window._app.achieveGoal(${g.id})">✓</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('goal', ${g.id}, this)">Удалить</button></div></div></div>`;
     }).join('');
 }
