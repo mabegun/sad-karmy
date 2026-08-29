@@ -1,6 +1,6 @@
 {
-  "version": "2.8.0",
+  "version": "2.8.1",
   "name": "Сад Кармы",
   "buildDate": "2026-08-29",
-  "changelog": "feat: кастомные модалки вместо alert/confirm"
+  "changelog": "fix: жёсткая перезагрузка при обновлении PWA"
 }
