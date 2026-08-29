@@ -47,6 +47,7 @@ window._app = {
     saveEditedSeed,
     completeSeedAction,
     undoSeedAction,
+    openNewSeedModal,
     openMeditation,
     exportData,
     handleFileImport,
