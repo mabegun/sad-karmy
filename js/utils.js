@@ -22,7 +22,7 @@ export function escapeAttr(text) {
 
 export function fmtDate(ts) {
     if (!ts) return '';
-    try { return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }); } catch (e) { return ''; }
+    try { return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }); } catch (e) { return ''; }
 }
 
 export function markInvalid(id) {
