@@ -1,6 +1,6 @@
 import { DB } from './db.js';
 import { escapeHtml, escapeAttr, markInvalid } from './utils.js';
-import { openModal, closeModal, openInstruction } from './modals.js';
+import { openModal, closeModal, openInstruction, confirmModal } from './modals.js';
 import { triggerRender } from './events.js';
 
 export function saveGoal() {
@@ -47,8 +47,8 @@ export function saveEditedGoal(id) {
     triggerRender();
 }
 
-export function achieveGoal(id) {
-    if (!confirm('Достигнута цель?')) return;
+export async function achieveGoal(id) {
+    if (!(await confirmModal('Достигнута цель?', 'Подтверди, что цель достигнута. Все семена переместятся в урожай.', 'Достигнута'))) return;
     let goals = DB.getGoals().map(g => g.id === id ? { ...g, completed: true } : g);
     let seeds = DB.getSeeds().map(s => s.goalId === id ? { ...s, isGoalAchieved: true } : s);
     DB.saveGoals(goals);
@@ -62,8 +62,8 @@ export function deleteGoalNow(id) {
     triggerRender();
 }
 
-export function undoHarvest(goalId) {
-    if (!confirm('Вернуть цель и все связанные семена обратно?\nСделанные поступки останутся сделанными.')) return;
+export async function undoHarvest(goalId) {
+    if (!(await confirmModal('Вернуть из урожая?', 'Цель и все семена вернутся в активные. Сделанные поступки останутся сделанными.', 'Вернуть'))) return;
     let goals = DB.getGoals().map(g =>
         g.id === goalId ? { ...g, completed: false } : g
     );

@@ -1,6 +1,6 @@
 import { DB } from './db.js';
 import { escapeHtml } from './utils.js';
-import { openModal, closeModal } from './modals.js';
+import { openModal, closeModal, confirmModal, alertModal } from './modals.js';
 import { triggerRender } from './events.js';
 
 /** Strip HTML tags from all string fields in imported data to prevent stored XSS. */
@@ -74,20 +74,21 @@ export function handleFileImport(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
         try {
             const data = JSON.parse(e.target.result);
             if (data.goals && data.seeds) {
-                if (confirm('Загрузить данные?')) {
+                const ok = await confirmModal('Импорт данных', 'Текущие цели и семена будут заменены загруженными. Продолжить?', 'Загрузить', true);
+                if (ok) {
                     sanitizeImportedData(data);
                     DB.saveGoals(data.goals);
                     DB.saveSeeds(data.seeds);
                     if (data.config) DB.saveConfig(data.config);
-                    alert('Готово!');
+                    alertModal('Готово', 'Данные успешно загружены.');
                     triggerRender();
                 }
-            } else alert('Неверный формат');
-        } catch (err) { alert('Ошибка'); }
+            } else alertModal('Ошибка', 'Неверный формат файла. Ожидаются цели и семена.');
+        } catch (err) { alertModal('Ошибка', 'Не удалось прочитать файл.'); }
     };
     reader.readAsText(file);
     event.target.value = '';
@@ -97,7 +98,7 @@ export function toggleNotification(enabled) {
     let config = DB.getConfig();
     config.notify = enabled;
     DB.saveConfig(config);
-    alert('В разработке.');
+    if (enabled) alertModal('Скоро', 'Уведомления пока в разработке. Воспользуйся кнопкой «Добавить в календарь» ниже.');
 }
 
 export function updateTime(time) {

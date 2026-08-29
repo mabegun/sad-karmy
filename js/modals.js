@@ -6,6 +6,33 @@ export function closeModal() {
     document.getElementById('modal').classList.remove('active');
 }
 
+/** Кастомный confirm — возвращает Promise<boolean> */
+export function confirmModal(title, text, confirmText = 'Подтвердить', danger = false) {
+    return new Promise(resolve => {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-body').innerHTML = `
+            <div style="font-size:14px;line-height:1.6;color:var(--text-ink);margin-bottom:20px;">${text}</div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-primary" style="flex:1;" id="confirm-cancel">Отмена</button>
+                <button class="btn ${danger ? 'btn-danger' : 'btn-success'}" style="flex:1;${danger ? 'background:var(--danger-color);color:white;border-color:var(--danger-color);' : ''}" id="confirm-ok">${confirmText}</button>
+            </div>
+        `;
+        openModal();
+        document.getElementById('confirm-cancel').onclick = () => { closeModal(); resolve(false); };
+        document.getElementById('confirm-ok').onclick = () => { closeModal(); resolve(true); };
+    });
+}
+
+/** Кастомный alert */
+export function alertModal(title, text) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-body').innerHTML = `
+        <div style="font-size:14px;line-height:1.6;color:var(--text-ink);">${text}</div>
+        <button class="btn btn-primary" style="width:100%;margin-top:20px;" onclick="window._app.closeModal()">OK</button>
+    `;
+    openModal();
+}
+
 export function openInfoMenu() {
     document.getElementById('info-menu-modal').classList.add('active');
 }

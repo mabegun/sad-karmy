@@ -4,7 +4,7 @@ let swRegistration = null;
 let updateAvailable = false;
 let notificationDismissed = false;
 
-import { openInfoMenu, closeInfoMenu } from './modals.js';
+import { openInfoMenu, closeInfoMenu, confirmModal } from './modals.js';
 
 const VERSION_STORAGE_KEY = 'sw_version';
 
@@ -135,8 +135,8 @@ export function updateApp() {
     });
 }
 
-export function confirmUpdate() {
-    if (confirm('Обновить приложение?\n\n\u2705 Ваши цели и семена сохранятся.')) {
+export async function confirmUpdate() {
+    if (await confirmModal('Обновить приложение?', 'Ваши цели и семена сохранятся. Обновить сейчас?', 'Обновить')) {
         updateApp();
     }
 }

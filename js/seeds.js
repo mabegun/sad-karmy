@@ -1,6 +1,6 @@
 import { DB } from './db.js';
 import { escapeHtml, escapeAttr, markInvalid } from './utils.js';
-import { openModal, closeModal, openInstruction } from './modals.js';
+import { openModal, closeModal, openInstruction, alertModal } from './modals.js';
 import { triggerRender } from './events.js';
 
 export function saveSeed() {
@@ -71,7 +71,7 @@ export function deleteSeedNow(id) {
 
 export function openNewSeedModal(goalId) {
     const activeGoals = DB.getGoals().filter(g => !g.completed);
-    if (activeGoals.length === 0) { alert('Сначала создайте цель!'); return; }
+    if (activeGoals.length === 0) { alertModal('Нет целей', 'Сначала создай цель, а затем сажай семена.'); return; }
     const preselected = goalId || activeGoals[0].id;
     const options = activeGoals.map(g => `<option value="${g.id}" ${g.id === preselected ? 'selected' : ''}>${escapeHtml(g.desire)}</option>`).join('');
     const goalObj = activeGoals.find(g => g.id === preselected);
