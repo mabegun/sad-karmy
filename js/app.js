@@ -1,9 +1,9 @@
 import { onRender } from './events.js';
-import { render, handleDeleteClick, showSeedsList, seedListAction } from './render.js';
+import { render, handleDeleteClick, showSeedsList, seedListAction, showHarvestTimeline } from './render.js';
 import { saveGoal, openEditGoalModal, saveEditedGoal, achieveGoal, undoHarvest, openNewGoalModal, closeAndOpenInstruction } from './goals.js';
 import { saveSeed, openEditSeedModal, saveEditedSeed, completeSeedAction, undoSeedAction, openNewSeedModal } from './seeds.js';
 import { openMeditation } from './meditation.js';
-import { exportData, handleFileImport, toggleNotification, updateTime, confirmWipeAll, wipeAll, openAbout } from './settings.js';
+import { exportData, handleFileImport, toggleNotification, updateTime, confirmWipeAll, wipeAll, openAbout, addToCalendar } from './settings.js';
 import { openInfoMenu, closeInfoMenu, closeModal, openInstruction, closeInstruction, openPrivacy, closePrivacy, openInstall, closeInstall, closeMeditationModal } from './modals.js';
 import { initVersionSystem, checkForUpdates, updateApp, confirmUpdate, hideUpdateNotification, updateVersionDisplay } from './version.js';
 
@@ -36,6 +36,7 @@ window._app = {
     handleDeleteClick,
     showSeedsList,
     seedListAction,
+    showHarvestTimeline,
     saveGoal,
     openEditGoalModal,
     saveEditedGoal,
@@ -65,6 +66,7 @@ window._app = {
     confirmWipeAll,
     wipeAll,
     openAbout,
+    addToCalendar,
     checkForUpdates,
     updateApp,
     confirmUpdate,

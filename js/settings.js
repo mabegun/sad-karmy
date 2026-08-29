@@ -1,6 +1,6 @@
 import { DB } from './db.js';
 import { escapeHtml } from './utils.js';
-import { openModal, closeModal, openInfoMenu } from './modals.js';
+import { openModal, closeModal } from './modals.js';
 import { triggerRender } from './events.js';
 
 /** Strip HTML tags from all string fields in imported data to prevent stored XSS. */
@@ -43,7 +43,8 @@ export function renderSettings() {
         <div class="settings-group">
             <div style="display: flex; justify-content: space-between; align-items: center;"><label style="margin: 0;">Уведомления</label><label class="toggle-switch"><input type="checkbox" id="notify-toggle" ${config.notify ? 'checked' : ''} onchange="window._app.toggleNotification(this.checked)"><span class="slider"></span></label></div>
             <div><label>Время напоминания</label><input type="time" id="reminder-time" value="${config.time}" onchange="window._app.updateTime(this.value)" style="margin-bottom: 0;"></div>
-            <p class="dev-warning">⚠️ Уведомления в разработке.</p>
+            <button class="btn-action secondary" style="margin-top: 12px;" onclick="window._app.addToCalendar()">📅 Добавить в календарь</button>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 8px; line-height: 1.4;">Ежедневное напоминание о медитации в указанное время. Работает через календарь устройства — без сервера.</p>
         </div>
         <h3 style="font-family: 'Cormorant Garamond', serif; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-top: 30px;">💾 Резервная копия</h3>
         <div class="settings-group" style="text-align: center;">
@@ -103,6 +104,44 @@ export function updateTime(time) {
     let config = DB.getConfig();
     config.time = time;
     DB.saveConfig(config);
+}
+
+export function addToCalendar() {
+    const config = DB.getConfig();
+    const time = config.time || '21:00';
+    const [hh, mm] = time.split(':');
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hh), parseInt(mm), 0);
+    const end = new Date(start.getTime() + 15 * 60 * 1000); // 15 мин
+    // Форматируем даты для ICS (YYYYMMDDTHHmmSS)
+    function pad(n) { return String(n).padStart(2, '0'); }
+    const dtStart = `${start.getFullYear()}${pad(start.getMonth()+1)}${pad(start.getDate())}T${pad(start.getHours())}${pad(start.getMinutes())}00`;
+    const dtEnd = `${end.getFullYear()}${pad(end.getMonth()+1)}${pad(end.getDate())}T${pad(end.getHours())}${pad(end.getMinutes())}00`;
+    const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Сад Кармы//Медитация//RU',
+        'BEGIN:VEVENT',
+        'DTSTART:' + dtStart,
+        'DTEND:' + dtEnd,
+        'RRULE:FREQ=DAILY',
+        'SUMMARY:Кофе-медитация \uD83C\uDF3E',
+        'DESCRIPTION:Пора порадоваться своим добрым делам! Открой Сад Кармы и порадуйся тому, что ты сделал для других.',
+        'BEGIN:VALARM',
+        'TRIGGER:-PT0M',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Пора на медитацию! Порадуйся добрым делам.',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sad-karmy-meditation.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 export function confirmWipeAll() {

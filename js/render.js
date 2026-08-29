@@ -7,14 +7,69 @@ import { deleteGoalNow } from './goals.js';
 import { deleteSeedNow } from './seeds.js';
 
 let deleteTimers = {};
+let undoSnapshots = {}; // { key: { goals, seeds } }
+let toastTimer = null;
+
+// ==================== ТОСТ (2.5) ====================
+
+export function showToast(message, actionLabel, onAction) {
+    const container = document.getElementById('toast-container');
+    container.innerHTML = '';
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    let html = `<span class="toast-message">${escapeHtml(message)}</span>`;
+    if (actionLabel && onAction) {
+        html += `<button class="toast-action">${escapeHtml(actionLabel)}</button>`;
+    }
+    toast.innerHTML = html;
+    container.appendChild(toast);
+    // Trigger animation
+    requestAnimationFrame(() => toast.classList.add('toast-visible'));
+    if (actionLabel && onAction) {
+        toast.querySelector('.toast-action').addEventListener('click', () => {
+            onAction();
+            hideToast();
+        });
+    }
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 5000);
+}
+
+function hideToast() {
+    const container = document.getElementById('toast-container');
+    const toast = container.querySelector('.toast');
+    if (!toast) return;
+    toast.classList.remove('toast-visible');
+    toast.addEventListener('transitionend', () => container.innerHTML = '', { once: true });
+    if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+}
+
+// ==================== УДАЛЕНИЕ С ОТМЕНОЙ (2.5) ====================
 
 export function handleDeleteClick(type, id, btnElement) {
     const key = type + id;
     if (deleteTimers[key]) {
         clearTimeout(deleteTimers[key]);
         delete deleteTimers[key];
+        // Save snapshot before deleting
+        undoSnapshots[key] = { goals: JSON.parse(JSON.stringify(DB.getGoals())), seeds: JSON.parse(JSON.stringify(DB.getSeeds())) };
         if (type === 'goal') deleteGoalNow(id);
         else deleteSeedNow(id);
+        showToast(
+            type === 'goal' ? 'Цель удалена' : 'Семя удалено',
+            'Отменить',
+            () => {
+                const snap = undoSnapshots[key];
+                if (snap) {
+                    DB.saveGoals(snap.goals);
+                    DB.saveSeeds(snap.seeds);
+                    delete undoSnapshots[key];
+                    triggerRender();
+                }
+            }
+        );
+        // Clean up snapshot after toast expires
+        setTimeout(() => delete undoSnapshots[key], 6000);
     } else {
         btnElement.classList.add('btn-delete-confirm');
         btnElement.innerText = "Точно?";
@@ -25,6 +80,8 @@ export function handleDeleteClick(type, id, btnElement) {
         }, 3000);
     }
 }
+
+// ==================== МОДАЛКА СЕМЯН (v2.5.0) ====================
 
 export function showSeedsList(goalId, type) {
     const seeds = DB.getSeeds().filter(s => s.goalId === goalId);
@@ -66,6 +123,51 @@ export function seedListAction(action, seedId, goalId, listType) {
     showSeedsList(goalId, listType);
     triggerRender();
 }
+
+// ==================== ИСТОРИЯ УРОЖАЯ (3.6) ====================
+
+export function showHarvestTimeline(goalId) {
+    const seeds = DB.getSeeds().filter(s => s.goalId === goalId);
+    const goal = DB.getGoals().find(g => g.id === goalId);
+    if (!goal) return;
+    const sorted = [...seeds].sort((a, b) => (a.doneAt || a.createdAt || 0) - (b.doneAt || b.createdAt || 0));
+    const total = sorted.length;
+    const doneCount = sorted.filter(s => s.isActionDone).length;
+    document.getElementById('modal-title').innerText = '\uD83C\uDF3E ' + escapeHtml(goal.desire);
+    const body = document.getElementById('modal-body');
+    if (sorted.length === 0) {
+        body.innerHTML = '<p style="text-align:center; color:#8D6E63">Нет записей</p>';
+    } else {
+        body.innerHTML = `
+            <div style="background:rgba(255,255,255,0.6);border-left:3px solid var(--success-color);padding:10px 12px;margin-bottom:15px;font-size:13px;border-radius:4px;color:var(--text-light);">
+                Исправить: ${escapeHtml(goal.problem)}<br>
+                <b>${doneCount}</b> из <b>${total}</b> семян сделано
+            </div>
+            <div class="timeline">${sorted.map((s, i) => {
+                const date = s.doneAt ? fmtDate(s.doneAt) : (s.createdAt ? fmtDate(s.createdAt) : '');
+                const isDone = s.isActionDone;
+                const isHarv = s.isGoalAchieved;
+                let dotClass = 'timeline-dot';
+                let statusLabel = '';
+                if (isHarv) { dotClass += ' harvested'; statusLabel = 'урожай'; }
+                else if (isDone) { dotClass += ' done'; statusLabel = 'сделано'; }
+                else { statusLabel = 'в плане'; }
+                return `<div class="timeline-item">
+                    <div class="${dotClass}"></div>
+                    <div class="timeline-content">
+                        <div style="font-size:12px;color:var(--accent-dark);margin-bottom:2px;">${date}${statusLabel ? ' · ' + statusLabel : ''}</div>
+                        <div><b>Для:</b> ${escapeHtml(s.person)}</div>
+                        <div style="color:var(--text-light);">${escapeHtml(s.action)}</div>
+                    </div>
+                </div>`;
+            }).join('')}</div>
+            <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:12px;font-style:italic;">Поливай свои семена радостью</div>
+        `;
+    }
+    openModal();
+}
+
+// ==================== РЕНДЕР ВКЛАДОК ====================
 
 function renderGoals() {
     const container = document.getElementById('tab-goals');
@@ -109,10 +211,23 @@ function renderDone() {
 
 function renderHarvest() {
     const container = document.getElementById('tab-harvest');
-    const seeds = DB.getSeeds().filter(s => s.isGoalAchieved);
-    if (seeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF3E</div><div class="empty-title">Урожай ещё впереди</div><p class="empty-desc">Когда цель достигнута — семена переместятся сюда. Продолжай сеять и радоваться.</p></div>'; return; }
-    container.innerHTML = seeds.map((s, idx) => `<div class="card" style="border-left-color: var(--success-color); animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title" style="color: var(--success-color);">Урожай: ${escapeHtml(s.goalText)}</div><div class="card-text">Для <b>${escapeHtml(s.person)}</b>: ${escapeHtml(s.action)}</div>
-        <div class="card-actions"><button class="btn btn-primary" onclick="window._app.undoHarvest(${s.goalId})">← Вернуть</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('seed', ${s.id}, this)">Удалить</button></div></div></div>`).join('');
+    const harvestSeeds = DB.getSeeds().filter(s => s.isGoalAchieved);
+    if (harvestSeeds.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83C\uDF3E</div><div class="empty-title">Урожай ещё впереди</div><p class="empty-desc">Когда цель достигнута — семена переместятся сюда. Продолжай сеять и радоваться.</p></div>'; return; }
+    // Group by goal
+    const byGoal = {};
+    harvestSeeds.forEach(s => {
+        if (!byGoal[s.goalId]) byGoal[s.goalId] = { goalText: s.goalText, seeds: [] };
+        byGoal[s.goalId].seeds.push(s);
+    });
+    const goalIds = Object.keys(byGoal);
+    container.innerHTML = goalIds.map((gid, idx) => {
+        const g = byGoal[gid];
+        const goal = DB.getGoals().find(gg => gg.id === parseInt(gid));
+        const doneCount = g.seeds.filter(s => s.isActionDone).length;
+        const totalCount = g.seeds.length;
+        return `<div class="card harvest-card" style="border-left-color: var(--success-color); animation-delay: ${idx * 50}ms" onclick="window._app.showHarvestTimeline(${gid})"><div class="card-body"><div class="card-title" style="color: var(--success-color);">\uD83C\uDF3E ${escapeHtml(g.goalText)}</div><div class="card-text">${doneCount} из ${totalCount} семян собрали урожай</div>${goal && goal.createdAt ? `<div class="card-meta">цель посажена ${fmtDate(goal.createdAt)}</div>` : ''}
+        <div class="card-actions"><button class="btn btn-primary" onclick="event.stopPropagation(); window._app.undoHarvest(${gid})">← Вернуть</button><button class="btn btn-danger" onclick="event.stopPropagation(); window._app.handleDeleteClick('goal', ${gid}, this)">Удалить цель</button></div></div></div>`;
+    }).join('');
 }
 
 export function render() {

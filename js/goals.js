@@ -58,6 +58,7 @@ export function achieveGoal(id) {
 
 export function deleteGoalNow(id) {
     DB.saveGoals(DB.getGoals().filter(g => g.id !== id));
+    DB.saveSeeds(DB.getSeeds().filter(s => s.goalId !== id));
     triggerRender();
 }
 

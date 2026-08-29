@@ -177,3 +177,26 @@ input:checked + .slider:before { transform: translateX(22px); }
 /* Плашка обновления */
 #update-notification { display: none; position: fixed; bottom: 80px; left: 20px; right: 20px; background: var(--accent-color); color: #3E2723; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; text-align: center; font-weight: bold; border: 2px solid #fff; }
 #update-notification .update-note { font-size: 12px; font-weight: normal; margin-top: 8px; opacity: 0.85; }
+
+/* --- Тост-уведомления --- */
+#toast-container { position: fixed; bottom: max(80px, calc(25px + env(safe-area-inset-bottom))); left: 20px; right: 20px; z-index: 1500; pointer-events: none; }
+.toast {
+    background: #3E2723; color: #F5F1E6; padding: 14px 16px; border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    transform: translateY(80px); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: auto;
+}
+.toast-visible { transform: translateY(0); opacity: 1; }
+.toast-message { flex: 1; font-size: 14px; }
+.toast-action { background: var(--accent-color); color: #3E2723; border: none; padding: 6px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Lora', serif; font-size: 13px; white-space: nowrap; }
+
+/* --- Таймлайн урожая --- */
+.harvest-card { cursor: pointer; }
+.harvest-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(46,125,50,0.2); }
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: #D7CCC8; }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-dot { position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: #EFEBE9; border: 2px solid #D7CCC8; }
+.timeline-dot.done { background: #A5D6A7; border-color: var(--success-color); }
+.timeline-dot.harvested { background: var(--success-color); border-color: #1B5E20; }
+.timeline-content { font-size: 13px; line-height: 1.5; }
