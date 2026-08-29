@@ -144,18 +144,21 @@ export function showHarvestTimeline(goalId) {
                 <b>${doneCount}</b> из <b>${total}</b> семян сделано
             </div>
             <div class="timeline">${sorted.map((s, i) => {
-                const date = s.doneAt ? fmtDate(s.doneAt) : (s.createdAt ? fmtDate(s.createdAt) : '');
                 const isDone = s.isActionDone;
                 const isHarv = s.isGoalAchieved;
                 let dotClass = 'timeline-dot';
                 let statusLabel = '';
                 if (isHarv) { dotClass += ' harvested'; statusLabel = 'урожай'; }
                 else if (isDone) { dotClass += ' done'; statusLabel = 'сделано'; }
-                else { statusLabel = 'в плане'; }
+                else { dotClass += ' planned'; statusLabel = 'в плане'; }
+                let dateParts = [];
+                if (s.createdAt) dateParts.push('посажено ' + fmtDate(s.createdAt));
+                if (s.doneAt) dateParts.push('сделано ' + fmtDate(s.doneAt));
+                const dateStr = dateParts.join(' → ');
                 return `<div class="timeline-item">
                     <div class="${dotClass}"></div>
                     <div class="timeline-content">
-                        <div style="font-size:12px;color:var(--accent-dark);margin-bottom:2px;">${date}${statusLabel ? ' · ' + statusLabel : ''}</div>
+                        <div style="font-size:12px;color:var(--accent-dark);margin-bottom:2px;">${dateStr}${statusLabel ? ' · ' + statusLabel : ''}</div>
                         <div><b>Для:</b> ${escapeHtml(s.person)}</div>
                         <div style="color:var(--text-light);">${escapeHtml(s.action)}</div>
                     </div>

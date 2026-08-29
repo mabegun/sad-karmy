@@ -197,6 +197,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 .timeline-item { position: relative; margin-bottom: 16px; }
 .timeline-item:last-child { margin-bottom: 0; }
 .timeline-dot { position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: #EFEBE9; border: 2px solid #D7CCC8; }
+.timeline-dot.planned { background: #FFF176; border-color: var(--accent-color); }
 .timeline-dot.done { background: #A5D6A7; border-color: var(--success-color); }
 .timeline-dot.harvested { background: var(--success-color); border-color: #1B5E20; }
 .timeline-content { font-size: 13px; line-height: 1.5; }
