@@ -184,7 +184,7 @@ function renderGoals() {
         const harvested = relatedSeeds.filter(s => s.isGoalAchieved).length;
         const pctDone = sown ? Math.round(doneCount / sown * 100) : 0;
         const pctHarv = sown ? Math.round(harvested / sown * 100) : 0;
-        const dateMeta = g.createdAt ? `<div class="card-meta">посажена ${fmtDate(g.createdAt)}</div>` : '';
+        const dateMeta = g.createdAt ? `<div class="card-meta">запланирована ${fmtDate(g.createdAt)}</div>` : '';
         return `<div class="card" style="animation-delay: ${idx * 50}ms"><div class="card-body"><div class="card-title">Цель: ${escapeHtml(g.desire)}</div><div class="card-text">Исправить: ${escapeHtml(g.problem)}</div><div class="goal-progress"><div class="fill-done" style="width: ${pctDone}%"></div><div class="fill-harvest" style="width: ${pctHarv}%"></div></div><div class="counters-container"><div class="counter-badge ${sown === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'planned')">\uD83C\uDF31 План: ${sown}</div><div class="counter-badge done ${doneCount === 0 ? 'zero' : ''}" onclick="window._app.showSeedsList(${g.id}, 'done')">\uD83D\uDE4F Сделано: ${doneCount}</div>${harvested > 0 ? `<div class="counter-badge done" style="color:var(--success-color);border-color:var(--success-color);">\uD83C\uDF3E ${harvested}</div>` : ''}</div>${dateMeta}
             <div class="card-actions"><button class="btn btn-warning" onclick="window._app.openEditGoalModal(${g.id})">✎</button><button class="btn btn-success" onclick="window._app.achieveGoal(${g.id})">✓</button><button class="btn btn-danger" onclick="window._app.handleDeleteClick('goal', ${g.id}, this)">Удалить</button></div></div></div>`;
     }).join('');
@@ -228,7 +228,7 @@ function renderHarvest() {
         const goal = DB.getGoals().find(gg => gg.id === parseInt(gid));
         const doneCount = g.seeds.filter(s => s.isActionDone).length;
         const totalCount = g.seeds.length;
-        return `<div class="card harvest-card" style="border-left-color: var(--success-color); animation-delay: ${idx * 50}ms" onclick="window._app.showHarvestTimeline(${gid})"><div class="card-body"><div class="card-title" style="color: var(--success-color);">\uD83C\uDF3E ${escapeHtml(g.goalText)}</div><div class="card-text">${doneCount} из ${totalCount} семян собрали урожай</div>${goal && goal.createdAt ? `<div class="card-meta">цель посажена ${fmtDate(goal.createdAt)}</div>` : ''}
+        return `<div class="card harvest-card" style="border-left-color: var(--success-color); animation-delay: ${idx * 50}ms" onclick="window._app.showHarvestTimeline(${gid})"><div class="card-body"><div class="card-title" style="color: var(--success-color);">\uD83C\uDF3E ${escapeHtml(g.goalText)}</div><div class="card-text">${doneCount} из ${totalCount} семян собрали урожай</div>${goal && goal.createdAt ? `<div class="card-meta">цель запланирована ${fmtDate(goal.createdAt)}</div>` : ''}
         <div class="card-actions"><button class="btn btn-primary" onclick="event.stopPropagation(); window._app.undoHarvest(${gid})">← Вернуть</button><button class="btn btn-danger" onclick="event.stopPropagation(); window._app.handleDeleteClick('goal', ${gid}, this)">Удалить цель</button></div></div></div>`;
     }).join('');
 }
