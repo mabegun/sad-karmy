@@ -69,10 +69,12 @@ export function deleteSeedNow(id) {
     triggerRender();
 }
 
-export function openNewSeedModal() {
+export function openNewSeedModal(goalId) {
     const activeGoals = DB.getGoals().filter(g => !g.completed);
     if (activeGoals.length === 0) { alert('Сначала создайте цель!'); return; }
-    const options = activeGoals.map(g => `<option value="${g.id}">${escapeHtml(g.desire)}</option>`).join('');
+    const preselected = goalId || activeGoals[0].id;
+    const options = activeGoals.map(g => `<option value="${g.id}" ${g.id === preselected ? 'selected' : ''}>${escapeHtml(g.desire)}</option>`).join('');
+    const goalObj = activeGoals.find(g => g.id === preselected);
     document.getElementById('modal-title').innerText = "Посеять семя \uD83C\uDF31";
     document.getElementById('modal-body').innerHTML = `
         <div style="background: rgba(255,255,255,0.7); border-left: 3px solid var(--accent-color); padding: 12px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; border-radius: 4px;">
@@ -81,8 +83,8 @@ export function openNewSeedModal() {
             Найди человека, которому тоже нужно то, что хочешь получить ты. Придумай, как именно ты ему поможешь.<br>
             <i>Например: хочешь больше клиентов — помоги коллеге найти стажёра.</i>
         </div>
-        <label>Для какой цели сеем?</label>
-        <select id="input-goal-id">${options}</select>
+        ${!goalId ? `<label>Для какой цели сеем?</label>
+        <select id="input-goal-id">${options}</select>` : `<input type="hidden" id="input-goal-id" value="${preselected}"><div style="background:rgba(46,125,50,0.08);border-left:3px solid var(--success-color);padding:10px 12px;margin-bottom:15px;font-size:13px;border-radius:4px;color:var(--text-light);">Цель: <b>${escapeHtml(goalObj.desire)}</b></div>`}
         <label>Для кого делаем доброе дело?</label>
         <input type="text" id="input-person" placeholder="Имя человека или описание группы">
         <label>Какой поступок планируешь?</label>
