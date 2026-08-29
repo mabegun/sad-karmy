@@ -1,6 +1,6 @@
 {
-  "version": "2.7.4",
+  "version": "2.8.0",
   "name": "Сад Кармы",
   "buildDate": "2026-08-29",
-  "changelog": "fix: кнопка +Семя теперь работает"
+  "changelog": "feat: кастомные модалки вместо alert/confirm"
 }
