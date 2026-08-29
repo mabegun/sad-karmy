@@ -156,12 +156,12 @@ export function initVersionSystem() {
         return;
     }
     
-    // Перезагружаем после смены контроллера
+    // Перезагружаем после смены контроллера (жёсткая перезагрузка с сбросом кэша)
     let reloadTriggered = false;
     navigator.serviceWorker.addEventListener('controllerchange', function () {
         if (reloadTriggered) return;
         reloadTriggered = true;
-        window.location.reload();
+        window.location.replace(window.location.pathname + '?v=' + Date.now());
     });
     
     // Принимаем версию от нового SW при активации
