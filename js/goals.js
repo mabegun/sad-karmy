@@ -25,8 +25,8 @@ export function openEditGoalModal(id) {
         </div>
         <label>Что не устраивает в жизни и хочется исправить?</label>
         <input type="text" id="input-fix" value="${escapeAttr(goal.problem)}">
-        <label>Что хочешь получить взамен?</label>
-        <input type="text" id="input-want" value="${escapeAttr(goal.desire)}">
+        <label>Что хочешь получить взамен? Сформулируй одним коротким предложением</label>
+        <textarea id="input-want" rows="3" style="resize:none;">${escapeHtml(goal.desire)}</textarea>
         <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="window._app.saveEditedGoal(${id})">Сохранить изменения</button>
         <a href="#" onclick="window._app.closeAndOpenInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">\uD83D\uDCD6 Открыть полную инструкцию</a>
     `;
@@ -85,8 +85,8 @@ export function openNewGoalModal() {
         </div>
         <label>Что не устраивает в жизни и хочется исправить?</label>
         <input type="text" id="input-fix" placeholder="Например: нехватка денег, одиночество...">
-        <label>Что хочешь получить взамен?</label>
-        <input type="text" id="input-want" placeholder="Например: стабильный доход, близкие отношения...">
+        <label>Что хочешь получить взамен? Сформулируй одним коротким предложением</label>
+        <textarea id="input-want" rows="3" placeholder="Например: стабильный доход, близкие отношения..." style="resize:none;"></textarea>
         <button class="btn btn-success" style="width:100%; margin-bottom: 10px;" onclick="window._app.saveGoal()">Сохранить цель</button>
         <a href="#" onclick="window._app.closeAndOpenInstruction(); return false;" style="font-size: 12px; color: var(--primary-color);">\uD83D\uDCD6 Открыть полную инструкцию</a>
     `;
